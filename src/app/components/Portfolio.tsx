@@ -2,75 +2,6 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { DATA, Lang, LangData, Project } from './portfolioData';
 import { STACK_ICONS } from './StackIcons';
 
-// ── Bat canvas ────────────────────────────────────────────────────────────────
-
-// Enhanced 8-bit pixel art bat sprites with more detail
-const BAT_FRAMES = [
-  // Frame 1: Wings mid-flap
-  [[0,0,1,1,0,0,1,1,0,0],[0,1,1,1,1,1,1,1,1,0],[1,1,1,0,1,1,0,1,1,1],[1,1,0,0,1,1,0,0,1,1],[0,1,1,0,0,0,0,1,1,0],[0,0,1,1,0,0,1,1,0,0],[0,0,0,1,1,1,1,0,0,0]],
-  // Frame 2: Wings down
-  [[0,0,0,1,1,1,0,0,0,0],[0,0,1,1,1,1,1,0,0,0],[0,1,1,0,1,1,0,1,1,0],[1,1,0,0,1,1,0,0,1,1],[1,1,1,0,0,0,0,1,1,1],[0,1,1,1,0,0,1,1,1,0],[0,0,1,1,0,0,1,1,0,0]],
-  // Frame 3: Wings up
-  [[1,1,0,0,1,1,0,0,1,1],[1,1,1,0,1,1,0,1,1,1],[0,1,1,1,1,1,1,1,1,0],[0,0,1,1,0,0,1,1,0,0],[0,0,0,1,1,1,1,0,0,0],[0,0,1,1,1,1,1,0,0,0],[0,0,0,1,1,1,0,0,0,0]],
-];
-
-function BatCanvas({ visible }: { visible: boolean }) {
-  const ref = useRef<HTMLCanvasElement>(null);
-  useEffect(() => {
-    const canvas = ref.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
-    resize();
-    window.addEventListener('resize', resize);
-    const spawnBat = () => {
-      const leftBound = () => canvas.width * 0.45;
-      const dir = Math.random() > 0.5 ? 1 : -1;
-      return {
-        x: leftBound() + Math.random() * (canvas.width - leftBound()),
-        y: Math.random() * canvas.height * 0.75 + 40,
-        vx: (Math.random() * 0.18 + 0.07) * dir,
-        phase: Math.random() * Math.PI * 2,
-        frame: 0,
-        timer: 0,
-        speed: Math.floor(Math.random() * 10 + 14),
-        s: Math.random() * 1.4 + 1.8,
-        color: Math.random() > 0.6 ? 'rgba(75,59,255,0.22)' : 'rgba(212,251,60,0.16)',
-      };
-    };
-    const bats = Array.from({ length: 18 }, spawnBat);
-    let raf: number;
-    const tick = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      const t = performance.now() / 1000;
-      const leftBound = canvas.width * 0.45;
-      for (const b of bats) {
-        b.x += b.vx;
-        b.y += Math.sin(t * 0.8 + b.phase) * 0.25;
-        b.timer++;
-        if (b.timer >= b.speed) { b.timer = 0; b.frame = (b.frame + 1) % 3; }
-        if (b.x > canvas.width + 20 || b.x < leftBound - 20) {
-          const fresh = spawnBat();
-          Object.assign(b, fresh);
-        }
-        const frame = BAT_FRAMES[b.frame];
-        ctx.fillStyle = b.color;
-        ctx.save();
-        if (b.vx < 0) { ctx.translate(b.x + 10 * b.s, b.y); ctx.scale(-1, 1); ctx.translate(-b.x, -b.y); }
-        for (let r = 0; r < frame.length; r++)
-          for (let c = 0; c < frame[r].length; c++)
-            if (frame[r][c]) ctx.fillRect(Math.round(b.x + c * b.s), Math.round(b.y + r * b.s), Math.ceil(b.s), Math.ceil(b.s));
-        ctx.restore();
-      }
-      raf = requestAnimationFrame(tick);
-    };
-    tick();
-    return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', resize); };
-  }, []);
-  return <canvas ref={ref} style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0, opacity: visible ? 1 : 0, transition: 'opacity 0.8s ease' }} />;
-}
-
 // ── Color constants ──────────────────────────────────────────────────────────
 
 const C = {
@@ -96,16 +27,6 @@ function MacDots() {
         <i key={i} style={{ width: 10, height: 10, borderRadius: '50%', background: bg, display: 'block' }} />
       ))}
     </div>
-  );
-}
-
-function Equalizer() {
-  return (
-    <span style={{ display: 'inline-flex', alignItems: 'flex-end', gap: 3, height: 18 }}>
-      {[40, 90, 60, 75].map((h, i) => (
-        <i key={i} className="p-eq-bar" style={{ height: `${h}%` }} />
-      ))}
-    </span>
   );
 }
 
@@ -141,7 +62,7 @@ function SectionHead({ title, ext, meta }: { title: string; ext: string; meta: s
 
 // ── README section ────────────────────────────────────────────────────────────
 
-function ReadmeSection({ d, onBatsReveal }: { d: LangData; onBatsReveal: () => void }) {
+function ReadmeSection({ d }: { d: LangData }) {
   const segs = [d.h1Line1, d.h1Line2, d.lede];
   const lens = segs.map(s => s.length);
   const total = lens[0] + lens[1] + lens[2];
@@ -153,9 +74,6 @@ function ReadmeSection({ d, onBatsReveal }: { d: LangData; onBatsReveal: () => v
   const [count, setCount] = useState(shouldAnimate ? 0 : total);
   const done = count >= total;
 
-  // Position in the full sequence where the Ozzy line starts
-  const ozzyStart = lens[0] + lens[1] + d.lede.indexOf('\n\n') + 2;
-
   useEffect(() => {
     if (!shouldAnimate || done) return;
     const id = setInterval(() => setCount((c: number) => Math.min(c + 1, total)), 22);
@@ -165,10 +83,6 @@ function ReadmeSection({ d, onBatsReveal }: { d: LangData; onBatsReveal: () => v
   useEffect(() => {
     if (done && shouldAnimate) localStorage.setItem('portfolio-typed', '1');
   }, [done]);
-
-  useEffect(() => {
-    if (shouldAnimate && count >= ozzyStart) onBatsReveal();
-  }, [count >= ozzyStart]);
 
   let r = count;
   const t0 = segs[0].slice(0, Math.min(r, lens[0])); r = Math.max(0, r - lens[0]);
@@ -184,7 +98,7 @@ function ReadmeSection({ d, onBatsReveal }: { d: LangData; onBatsReveal: () => v
         <b style={{ color: C.muted, fontWeight: 500 }}>{d.secMarker}</b>
       </div>
 
-      <div className="p-readme-head" style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 30, alignItems: 'start' }}>
+      <div className="p-readme-head" style={{ display: 'grid', gridTemplateColumns: '1fr minmax(0, 340px)', gap: 30, alignItems: 'start' }}>
         <div>
           <h1 style={{ fontFamily: C.sans, fontSize: 'clamp(38px, 6vw, 56px)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1, margin: '0 0 14px', color: C.ink }}>
             {t0}{seg === 0 ? cur : null}<br />
@@ -202,13 +116,15 @@ function ReadmeSection({ d, onBatsReveal }: { d: LangData; onBatsReveal: () => v
           </a>
         </div>
 
-        <div style={{ border: `1px solid ${C.line}`, background: C.panel, padding: '14px 16px', borderRadius: 4, minWidth: 240 }}>
-          {Object.entries(d.stats).map(([k, v], i, arr) => (
-            <div key={k} style={{ display: 'flex', justifyContent: 'space-between', gap: 16, fontSize: 11, padding: '4px 0', borderBottom: i < arr.length - 1 ? `1px dashed ${C.line}` : 'none' }}>
-              <span style={{ color: C.muted }}>{k}</span>
-              <span style={{ color: C.ink, textAlign: 'right' }}>{v}</span>
-            </div>
-          ))}
+        <div className="p-readme-side">
+          <div className="p-readme-stats" style={{ border: `1px solid ${C.line}`, background: C.panel, padding: '14px 16px', borderRadius: 4, width: '100%' }}>
+            {Object.entries(d.stats).map(([k, v], i, arr) => (
+              <div key={k} style={{ display: 'flex', justifyContent: 'space-between', gap: 16, fontSize: 11, padding: '4px 0', borderBottom: i < arr.length - 1 ? `1px dashed ${C.line}` : 'none' }}>
+                <span style={{ color: C.muted }}>{k}</span>
+                <span style={{ color: C.ink, textAlign: 'right' }}>{v}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -461,30 +377,65 @@ function ContactSection({ d }: { d: LangData }) {
 
 // ── Vibes section ─────────────────────────────────────────────────────────────
 
-function VibesSection({ d, tracksIdx, onCycleTrack }: { d: LangData; tracksIdx: number; onCycleTrack: () => void }) {
+function VibesSection({ d }: { d: LangData }) {
   return (
     <section id="vibes" style={{ scrollMarginTop: 60 }}>
       <SectionHead title={d.secVibesTitle} ext=".mp3" meta={d.secVibesMeta} />
-      <div className="p-vibes" onClick={onCycleTrack}>
-        <Equalizer />
-        <span style={{ fontFamily: C.mono, fontSize: 12, color: C.muted }}>
-          {d.vibesLabel} <b style={{ color: C.ink, fontWeight: 400 }}>{d.tracks[tracksIdx]}</b>
-        </span>
-      </div>
-      <div style={{ marginTop: 20 }}>
-        <CodeBlock>
-          <div><Ln n={1} /><Com c="// playlist" /></div>
-          {d.tracks.map((t, i) => (
-            <div key={i}>
-              <Ln n={i + 2} />
-              <Fn c={i === tracksIdx ? '▶' : ' '} />{' '}
-              {i === tracksIdx ? <Str c={t} /> : <Com c={t} />}
+      <a
+        href={d.vibesPlaylistHref}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="p-vibes"
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 16,
+          textDecoration: 'none',
+          background: 'linear-gradient(135deg, rgba(29,185,84,0.18), rgba(28,28,32,0.96) 45%, rgba(21,21,23,1))',
+          border: `1px solid rgba(29,185,84,0.28)`,
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
+          <img
+            src={d.vibesArtworkSrc}
+            alt={d.vibesArtworkAlt}
+            style={{
+              width: 54,
+              height: 54,
+              borderRadius: 8,
+              objectFit: 'cover',
+              boxShadow: '0 10px 28px rgba(0,0,0,0.28)',
+              flexShrink: 0,
+            }}
+          />
+          <div style={{ minWidth: 0 }}>
+            <div style={{ fontFamily: C.mono, fontSize: 11, color: 'rgba(232,232,234,0.72)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+              {d.vibesLabel}
             </div>
-          ))}
-          <div><Ln n={d.tracks.length + 2} />&nbsp;</div>
-          <div><Ln n={d.tracks.length + 3} /><Com c={'// "que sais-je?" — m. montaigne, 1580'} /></div>
-        </CodeBlock>
-      </div>
+            <div style={{ color: C.ink, fontSize: 16, lineHeight: 1.25, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {d.vibesPlaylistTitle}
+            </div>
+            <div style={{ color: C.muted, fontSize: 12 }}>
+              {d.vibesPlaylistMeta}
+            </div>
+          </div>
+        </div>
+        <span
+          style={{
+            color: '#0c0c0d',
+            background: '#1db954',
+            padding: '8px 12px',
+            borderRadius: 999,
+            fontSize: 11,
+            fontFamily: C.mono,
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+          }}
+        >
+          {d.vibesPlaylistCta} ↗
+        </span>
+      </a>
     </section>
   );
 }
@@ -562,12 +513,12 @@ function CaseView({ project, d, onBack }: { project: Project; d: LangData; onBac
           </span>
         </div>
 
-        <div className="p-case-screen-body">
+        <div className={`p-case-screen-body${current.image ? ' p-has-image' : ''}`}>
           {current.image ? (
             <img
               src={current.image}
               alt={current.alt || project.subtitle}
-              style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block', borderRadius: 0 }}
+              style={{ width: 'auto', maxWidth: '100%', height: 'auto', display: 'block', borderRadius: 0, margin: '0 auto' }}
             />
           ) : (
             <span style={{ position: 'relative', zIndex: 3, fontFamily: C.mono, fontSize: 11, color: C.muted, padding: '8px 14px', border: `1px dashed ${C.line}`, borderRadius: 3, background: 'rgba(21,21,23,0.7)', backdropFilter: 'blur(4px)', textAlign: 'center', maxWidth: '80%', lineHeight: 1.5 }}>
@@ -621,10 +572,8 @@ export function Portfolio() {
     return 'en';
   });
   const [currentCase, setCurrentCase] = useState<string | null>(null);
-  const [tracksIdx, setTracksIdx] = useState(0);
   const [activeSection, setActiveSection] = useState('readme');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [batsVisible, setBatsVisible] = useState(() => !!localStorage.getItem('portfolio-typed'));
   const mainRef = useRef<HTMLDivElement>(null);
   const d = DATA[lang];
 
@@ -736,8 +685,6 @@ export function Portfolio() {
 
   return (
     <div className="p-root" style={{ position: 'relative' }}>
-      <BatCanvas visible={batsVisible} />
-
       {/* Grid */}
       <div className="p-grid" style={{ display: 'grid', gridTemplateRows: '36px 1fr 22px', gridTemplateColumns: '260px 1fr', gridTemplateAreas: '"top top" "side main" "status status"', height: '100vh', position: 'relative', zIndex: 1 }}>
 
@@ -789,11 +736,11 @@ export function Portfolio() {
               <CaseView project={currentProject} d={d} onBack={closeCase} />
             ) : (
               <>
-                <ReadmeSection d={d} onBatsReveal={() => setBatsVisible(true)} />
+                <ReadmeSection d={d} />
                 <ProjectsSection d={d} onOpenCase={openCase} />
                 <StackSection d={d} />
                 <ContactSection d={d} />
-                <VibesSection d={d} tracksIdx={tracksIdx} onCycleTrack={() => setTracksIdx(i => (i + 1) % d.tracks.length)} />
+                <VibesSection d={d} />
               </>
             )}
           </div>
