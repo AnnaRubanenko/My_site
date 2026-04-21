@@ -2,6 +2,70 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { DATA, Lang, LangData, Project } from './portfolioData';
 import { STACK_ICONS } from './StackIcons';
 
+// ── Bat canvas ────────────────────────────────────────────────────────────────
+
+const BAT_FRAMES = [
+  [[1,0,1,0,0,0,1,0,1],[0,1,1,1,1,1,1,1,0],[0,0,1,1,1,1,1,0,0],[0,0,0,1,0,1,0,0,0],[0,0,0,0,1,0,0,0,0]],
+  [[0,0,0,0,0,0,0,0,0],[1,1,0,1,1,1,0,1,1],[0,1,1,1,1,1,1,1,0],[0,0,0,1,0,1,0,0,0],[0,0,0,0,1,0,0,0,0]],
+  [[0,0,0,0,0,0,0,0,0],[0,1,0,0,0,0,0,1,0],[1,1,1,1,1,1,1,1,1],[0,0,0,1,0,1,0,0,0],[0,0,0,0,1,0,0,0,0]],
+];
+
+function BatCanvas({ visible }: { visible: boolean }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const canvas = ref.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+    resize();
+    window.addEventListener('resize', resize);
+    const spawnBat = () => {
+      const leftBound = () => canvas.width * 0.45;
+      const dir = Math.random() > 0.5 ? 1 : -1;
+      return {
+        x: leftBound() + Math.random() * (canvas.width - leftBound()),
+        y: Math.random() * canvas.height * 0.75 + 40,
+        vx: (Math.random() * 0.18 + 0.07) * dir,
+        phase: Math.random() * Math.PI * 2,
+        frame: 0,
+        timer: 0,
+        speed: Math.floor(Math.random() * 10 + 14),
+        s: Math.random() * 1.2 + 1.4,
+      };
+    };
+    const bats = Array.from({ length: 10 }, spawnBat);
+    let raf: number;
+    const tick = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const t = performance.now() / 1000;
+      const leftBound = canvas.width * 0.45;
+      for (const b of bats) {
+        b.x += b.vx;
+        b.y += Math.sin(t * 0.8 + b.phase) * 0.25;
+        b.timer++;
+        if (b.timer >= b.speed) { b.timer = 0; b.frame = (b.frame + 1) % 3; }
+        if (b.x > canvas.width + 20 || b.x < leftBound - 20) {
+          const fresh = spawnBat();
+          Object.assign(b, fresh);
+        }
+        const frame = BAT_FRAMES[b.frame];
+        ctx.fillStyle = 'rgba(130,110,255,0.18)';
+        ctx.save();
+        if (b.vx < 0) { ctx.translate(b.x + 9 * b.s, b.y); ctx.scale(-1, 1); ctx.translate(-b.x, -b.y); }
+        for (let r = 0; r < frame.length; r++)
+          for (let c = 0; c < frame[r].length; c++)
+            if (frame[r][c]) ctx.fillRect(Math.round(b.x + c * b.s), Math.round(b.y + r * b.s), Math.ceil(b.s), Math.ceil(b.s));
+        ctx.restore();
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    tick();
+    return () => { cancelAnimationFrame(raf); window.removeEventListener('resize', resize); };
+  }, []);
+  return <canvas ref={ref} style={{ position: 'fixed', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: 0, opacity: visible ? 1 : 0, transition: 'opacity 0.8s ease' }} />;
+}
+
 // ── Color constants ──────────────────────────────────────────────────────────
 
 const C = {
@@ -72,7 +136,43 @@ function SectionHead({ title, ext, meta }: { title: string; ext: string; meta: s
 
 // ── README section ────────────────────────────────────────────────────────────
 
-function ReadmeSection({ d }: { d: LangData }) {
+function ReadmeSection({ d, onBatsReveal }: { d: LangData; onBatsReveal: () => void }) {
+  const segs = [d.h1Line1, d.h1Line2, d.lede];
+  const lens = segs.map(s => s.length);
+  const total = lens[0] + lens[1] + lens[2];
+
+  const shouldAnimate = useRef(
+    window.innerWidth > 768 && !localStorage.getItem('portfolio-typed')
+  ).current;
+
+  const [count, setCount] = useState(shouldAnimate ? 0 : total);
+  const done = count >= total;
+
+  // Position in the full sequence where the Ozzy line starts
+  const ozzyStart = lens[0] + lens[1] + d.lede.indexOf('\n\n') + 2;
+
+  useEffect(() => {
+    if (!shouldAnimate || done) return;
+    const id = setInterval(() => setCount((c: number) => Math.min(c + 1, total)), 22);
+    return () => clearInterval(id);
+  }, []);
+
+  useEffect(() => {
+    if (done && shouldAnimate) localStorage.setItem('portfolio-typed', '1');
+  }, [done]);
+
+  useEffect(() => {
+    if (shouldAnimate && count >= ozzyStart) onBatsReveal();
+  }, [count >= ozzyStart]);
+
+  let r = count;
+  const t0 = segs[0].slice(0, Math.min(r, lens[0])); r = Math.max(0, r - lens[0]);
+  const t1 = segs[1].slice(0, Math.min(r, lens[1])); r = Math.max(0, r - lens[1]);
+  const t2 = segs[2].slice(0, r);
+
+  const seg = count < lens[0] ? 0 : count < lens[0] + lens[1] ? 1 : 2;
+  const cur = !done ? <span className="p-type-cursor" /> : null;
+
   return (
     <section id="readme" style={{ scrollMarginTop: 60 }}>
       <div className="p-readme-marker" style={{ fontSize: 11, color: C.muted, marginBottom: 14, fontFamily: C.mono }}>
@@ -82,11 +182,11 @@ function ReadmeSection({ d }: { d: LangData }) {
       <div className="p-readme-head" style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: 30, alignItems: 'start' }}>
         <div>
           <h1 style={{ fontFamily: C.sans, fontSize: 'clamp(38px, 6vw, 56px)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1, margin: '0 0 14px', color: C.ink }}>
-            {d.h1Line1}<br />
-            <span style={{ color: C.accent2 }}>{d.h1Line2}</span>
+            {t0}{seg === 0 ? cur : null}<br />
+            <span style={{ color: C.accent2 }}>{t1}{seg === 1 ? cur : null}</span>
           </h1>
           <p style={{ fontFamily: C.sans, fontSize: 18, lineHeight: 1.55, color: C.ink, maxWidth: 620, margin: 0, whiteSpace: 'pre-line' }}>
-            {d.lede}
+            {t2}{seg === 2 ? cur : null}
           </p>
           <a href="https://t.me/annademeshko" target="_blank" rel="noopener" className="p-tg-cta">
             <svg width={14} height={14} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -519,6 +619,7 @@ export function Portfolio() {
   const [tracksIdx, setTracksIdx] = useState(0);
   const [activeSection, setActiveSection] = useState('readme');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [batsVisible, setBatsVisible] = useState(() => !!localStorage.getItem('portfolio-typed'));
   const mainRef = useRef<HTMLDivElement>(null);
   const d = DATA[lang];
 
@@ -599,8 +700,8 @@ export function Portfolio() {
     const isActive = currentCase ? (isProject && id === currentCase) : (!isProject && id === activeSection);
     const inner = (
       <>
-        <span className="p-tico" style={{ width: 12, display: 'inline-block', flexShrink: 0, fontSize: 10, color: isActive ? C.accent2 : C.muted, lineHeight: '10px', textAlign: 'center' }}>{icon}</span>
-        <span className="p-tname" style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: isActive ? C.accent2 : C.ink }}>{name}</span>
+        <span className="p-tico" style={{ width: 12, display: 'inline-block', flexShrink: 0, fontSize: 10, lineHeight: '10px', textAlign: 'center' }}>{icon}</span>
+        <span className="p-tname" style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{name}</span>
         <span style={{ color: C.muted, opacity: 0.7, fontSize: 12 }}>{ext}</span>
       </>
     );
@@ -630,9 +731,10 @@ export function Portfolio() {
 
   return (
     <div className="p-root" style={{ position: 'relative' }}>
+      <BatCanvas visible={batsVisible} />
 
       {/* Grid */}
-      <div className="p-grid" style={{ display: 'grid', gridTemplateRows: '36px 1fr 22px', gridTemplateColumns: '260px 1fr', gridTemplateAreas: '"top top" "side main" "status status"', height: '100vh' }}>
+      <div className="p-grid" style={{ display: 'grid', gridTemplateRows: '36px 1fr 22px', gridTemplateColumns: '260px 1fr', gridTemplateAreas: '"top top" "side main" "status status"', height: '100vh', position: 'relative', zIndex: 1 }}>
 
         {/* Top bar */}
         <header style={{ gridArea: 'top', borderBottom: `1px solid ${C.line}`, background: C.panel, display: 'flex', alignItems: 'center', padding: '0 14px', gap: 14, fontSize: 11, color: C.muted, fontFamily: C.mono }}>
@@ -682,7 +784,7 @@ export function Portfolio() {
               <CaseView project={currentProject} d={d} onBack={closeCase} />
             ) : (
               <>
-                <ReadmeSection d={d} />
+                <ReadmeSection d={d} onBatsReveal={() => setBatsVisible(true)} />
                 <ProjectsSection d={d} onOpenCase={openCase} />
                 <StackSection d={d} />
                 <ContactSection d={d} />
