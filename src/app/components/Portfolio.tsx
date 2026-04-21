@@ -595,8 +595,22 @@ export function Portfolio() {
   const currentProject = currentCase ? d.projects.find(p => p.id === currentCase) : null;
 
   // Sidebar tree item
-  function TreeItem({ id, icon, name, ext, isProject = false }: { id: string; icon: string; name: string; ext: string; isProject?: boolean }) {
+  function TreeItem({ id, icon, name, ext, isProject = false, href }: { id: string; icon: string; name: string; ext: string; isProject?: boolean; href?: string }) {
     const isActive = currentCase ? (isProject && id === currentCase) : (!isProject && id === activeSection);
+    const inner = (
+      <>
+        <span className="p-tico" style={{ width: 12, display: 'inline-block', flexShrink: 0, fontSize: 10, color: isActive ? C.accent2 : C.muted, lineHeight: '10px', textAlign: 'center' }}>{icon}</span>
+        <span className="p-tname" style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: isActive ? C.accent2 : C.ink }}>{name}</span>
+        <span style={{ color: C.muted, opacity: 0.7, fontSize: 12 }}>{ext}</span>
+      </>
+    );
+    if (href) {
+      return (
+        <a href={href} target="_blank" rel="noopener noreferrer" className={`p-tree-item${isActive ? ' p-active' : ''}`} style={{ width: '100%', textAlign: 'left', textDecoration: 'none' }}>
+          {inner}
+        </a>
+      );
+    }
     return (
       <button
         className={`p-tree-item${isActive ? ' p-active' : ''}`}
@@ -608,9 +622,7 @@ export function Portfolio() {
         }}
         style={{ width: '100%', textAlign: 'left', background: 'transparent', border: 'none' }}
       >
-        <span className="p-tico" style={{ width: 12, display: 'inline-block', flexShrink: 0, fontSize: 10, color: isActive ? C.accent2 : C.muted, lineHeight: '10px', textAlign: 'center' }}>{icon}</span>
-        <span className="p-tname" style={{ flex: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', color: isActive ? C.accent2 : C.ink }}>{name}</span>
-        <span style={{ color: C.muted, opacity: 0.7, fontSize: 12 }}>{ext}</span>
+        {inner}
       </button>
     );
   }
@@ -646,7 +658,7 @@ export function Portfolio() {
         {/* Sidebar */}
         <aside className={`p-sidebar${sidebarOpen ? ' p-sidebar-open' : ''}`} style={{ gridArea: 'side', background: C.panel, borderRight: `1px solid ${C.line}`, overflowY: 'auto', padding: '8px 0 20px' }}>
           {[
-            { label: d.folderAbout, items: [{ id: 'readme', icon: '☰', name: 'readme', ext: '.md' }, { id: 'stack', icon: '☰', name: 'stack', ext: '.json' }] },
+            { label: d.folderAbout, items: [{ id: 'readme', icon: '☰', name: 'readme', ext: '.md' }, { id: 'stack', icon: '☰', name: 'stack', ext: '.json' }, { id: 'cv', icon: '↓', name: 'cv', ext: '.pdf', href: '#' }] },
             { label: d.folderProjects, items: d.projects.map(p => ({ id: p.id, icon: '◆', name: p.id, ext: '.case', isProject: true })) },
             { label: d.folderEtc, items: [{ id: 'contact', icon: '@', name: 'contact', ext: '.md' }, { id: 'vibes', icon: '♪', name: 'vibes', ext: '.mp3' }] },
           ].map(folder => (
@@ -697,29 +709,28 @@ export function Portfolio() {
 
         {/* Mobile bottom nav */}
         <nav className="p-mobile-nav">
-          {currentCase ? (
-            <button className="p-mobile-nav-back" onClick={closeCase}>
-              <span>← Back</span>
-            </button>
-          ) : (
-            [
-              { id: 'readme', label: 'About' },
-              { id: 'projects', label: 'Projects' },
-              { id: 'contact', label: 'Contact' },
-            ].map((item, idx, arr) => (
-              <button
-                key={item.id}
-                className={`p-mobile-nav-btn${activeSection === item.id ? ' p-active' : ''}`}
-                onClick={() => {
-                  setSidebarOpen(false);
+          {[
+            { id: 'readme', label: 'About' },
+            { id: 'projects', label: 'Projects' },
+            { id: 'contact', label: 'Contact' },
+          ].map((item, idx, arr) => (
+            <button
+              key={item.id}
+              className={`p-mobile-nav-btn${!currentCase && activeSection === item.id ? ' p-active' : ''}`}
+              onClick={() => {
+                setSidebarOpen(false);
+                if (currentCase) {
+                  setCurrentCase(null);
+                  requestAnimationFrame(() => scrollToSection(item.id));
+                } else {
                   scrollToSection(item.id);
-                }}
-                style={{ borderRight: idx < arr.length - 1 ? `1px solid ${C.line}` : 'none' }}
-              >
-                {item.label}
-              </button>
-            ))
-          )}
+                }
+              }}
+              style={{ borderRight: idx < arr.length - 1 ? `1px solid ${C.line}` : 'none' }}
+            >
+              {item.label}
+            </button>
+          ))}
         </nav>
       </div>
     </div>

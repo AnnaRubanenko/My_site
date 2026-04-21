@@ -607,7 +607,7 @@
 
   /* Projects - HIG Touch Targets (min 44pt) */
   .p-proj {
-    grid-template-columns: 40px 1fr !important;
+    grid-template-columns: 1fr !important;
     gap: 16px !important;
     padding: 16px 20px !important;
     min-height: 72px;
@@ -621,7 +621,7 @@
     transform: scale(0.98);
   }
   .p-proj > div:nth-child(1) {
-    font-size: 13px !important;
+    display: none !important;
   }
   .p-proj > div:nth-child(2) > div:first-child {
     font-size: 17px !important;
