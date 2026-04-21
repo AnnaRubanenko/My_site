@@ -4,10 +4,14 @@ import { STACK_ICONS } from './StackIcons';
 
 // ── Bat canvas ────────────────────────────────────────────────────────────────
 
+// Enhanced 8-bit pixel art bat sprites with more detail
 const BAT_FRAMES = [
-  [[1,0,1,0,0,0,1,0,1],[0,1,1,1,1,1,1,1,0],[0,0,1,1,1,1,1,0,0],[0,0,0,1,0,1,0,0,0],[0,0,0,0,1,0,0,0,0]],
-  [[0,0,0,0,0,0,0,0,0],[1,1,0,1,1,1,0,1,1],[0,1,1,1,1,1,1,1,0],[0,0,0,1,0,1,0,0,0],[0,0,0,0,1,0,0,0,0]],
-  [[0,0,0,0,0,0,0,0,0],[0,1,0,0,0,0,0,1,0],[1,1,1,1,1,1,1,1,1],[0,0,0,1,0,1,0,0,0],[0,0,0,0,1,0,0,0,0]],
+  // Frame 1: Wings mid-flap
+  [[0,0,1,1,0,0,1,1,0,0],[0,1,1,1,1,1,1,1,1,0],[1,1,1,0,1,1,0,1,1,1],[1,1,0,0,1,1,0,0,1,1],[0,1,1,0,0,0,0,1,1,0],[0,0,1,1,0,0,1,1,0,0],[0,0,0,1,1,1,1,0,0,0]],
+  // Frame 2: Wings down
+  [[0,0,0,1,1,1,0,0,0,0],[0,0,1,1,1,1,1,0,0,0],[0,1,1,0,1,1,0,1,1,0],[1,1,0,0,1,1,0,0,1,1],[1,1,1,0,0,0,0,1,1,1],[0,1,1,1,0,0,1,1,1,0],[0,0,1,1,0,0,1,1,0,0]],
+  // Frame 3: Wings up
+  [[1,1,0,0,1,1,0,0,1,1],[1,1,1,0,1,1,0,1,1,1],[0,1,1,1,1,1,1,1,1,0],[0,0,1,1,0,0,1,1,0,0],[0,0,0,1,1,1,1,0,0,0],[0,0,1,1,1,1,1,0,0,0],[0,0,0,1,1,1,0,0,0,0]],
 ];
 
 function BatCanvas({ visible }: { visible: boolean }) {
@@ -31,10 +35,11 @@ function BatCanvas({ visible }: { visible: boolean }) {
         frame: 0,
         timer: 0,
         speed: Math.floor(Math.random() * 10 + 14),
-        s: Math.random() * 1.2 + 1.4,
+        s: Math.random() * 1.4 + 1.8,
+        color: Math.random() > 0.6 ? 'rgba(75,59,255,0.22)' : 'rgba(212,251,60,0.16)',
       };
     };
-    const bats = Array.from({ length: 10 }, spawnBat);
+    const bats = Array.from({ length: 18 }, spawnBat);
     let raf: number;
     const tick = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -50,9 +55,9 @@ function BatCanvas({ visible }: { visible: boolean }) {
           Object.assign(b, fresh);
         }
         const frame = BAT_FRAMES[b.frame];
-        ctx.fillStyle = 'rgba(130,110,255,0.18)';
+        ctx.fillStyle = b.color;
         ctx.save();
-        if (b.vx < 0) { ctx.translate(b.x + 9 * b.s, b.y); ctx.scale(-1, 1); ctx.translate(-b.x, -b.y); }
+        if (b.vx < 0) { ctx.translate(b.x + 10 * b.s, b.y); ctx.scale(-1, 1); ctx.translate(-b.x, -b.y); }
         for (let r = 0; r < frame.length; r++)
           for (let c = 0; c < frame[r].length; c++)
             if (frame[r][c]) ctx.fillRect(Math.round(b.x + c * b.s), Math.round(b.y + r * b.s), Math.ceil(b.s), Math.ceil(b.s));
