@@ -62,11 +62,12 @@ function SectionHead({ title, ext, meta }: { title: string; ext: string; meta: s
 
 function PixelBat() {
   return (
-    <div className="p-readme-bat" aria-hidden>
+    <button className="p-readme-bat" type="button" aria-label="rock n roll bat">
+      <span className="p-readme-bat-bubble">ROCK'N ROLL!!!</span>
       <img src="/portfolio/bat.png" alt="" className="p-readme-bat-img p-readme-bat-body" />
       <img src="/portfolio/bat.png" alt="" className="p-readme-bat-img p-readme-bat-wing-layer p-readme-bat-wing-layer-left" />
       <img src="/portfolio/bat.png" alt="" className="p-readme-bat-img p-readme-bat-wing-layer p-readme-bat-wing-layer-right" />
-    </div>
+    </button>
   );
 }
 
@@ -162,6 +163,16 @@ function ReadmeSection({ d }: { d: LangData }) {
 
 function ProjectRow({ p, idx, onOpenCase }: { p: Project; idx: number; onOpenCase: (id: string) => void }) {
   const [hovered, setHovered] = useState(false);
+
+  if (p.isLoading) {
+    return (
+      <div id={p.id} className="p-proj p-proj-loading-bar">
+        <span className="p-proj-loading-spinner" />
+        <span>{p.title}</span>
+      </div>
+    );
+  }
+
   return (
     <button
       key={p.id}
@@ -209,16 +220,8 @@ function ProjectRow({ p, idx, onOpenCase }: { p: Project; idx: number; onOpenCas
           transform: hovered ? 'scale(1.05)' : 'scale(1)',
           transition: 'transform 0.2s ease, border-color 0.2s ease',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          background: p.id === 'loading' ? C.panel : undefined,
         }}
       >
-        {p.id === 'loading' && (
-          <div style={{
-            width: 20, height: 20, border: `2px solid ${C.muted}`,
-            borderTop: `2px solid ${C.accent2}`, borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-          }} />
-        )}
       </div>
     </button>
   );
@@ -608,7 +611,6 @@ export function Portfolio() {
   }, []);
 
   const openCase = useCallback((id: string) => {
-    if (id === 'loading') return; // Don't open loading placeholder
     setCurrentCase(id);
     requestAnimationFrame(() => mainRef.current?.scrollTo({ top: 0 }));
   }, []);
@@ -738,7 +740,7 @@ export function Portfolio() {
         <aside className={`p-sidebar${sidebarOpen ? ' p-sidebar-open' : ''}`} style={{ gridArea: 'side', background: C.panel, borderRight: `1px solid ${C.line}`, overflowY: 'auto', padding: '8px 0 20px' }}>
           {[
             { label: d.folderAbout, items: [{ id: 'readme', icon: '☰', name: 'readme', ext: '.md' }, { id: 'stack', icon: '☰', name: 'stack', ext: '.json' }, { id: 'cv', icon: '↓', name: 'cv', ext: '.pdf', href: '#' }] },
-            { label: d.folderProjects, items: d.projects.map(p => ({ id: p.id, icon: '◆', name: p.id, ext: '.case', isProject: true })) },
+            { label: d.folderProjects, items: d.projects.filter(p => !p.isLoading).map(p => ({ id: p.id, icon: '◆', name: p.id, ext: '.case', isProject: true })) },
             { label: d.folderEtc, items: [{ id: 'contact', icon: '@', name: 'contact', ext: '.md' }, { id: 'vibes', icon: '♪', name: 'vibes', ext: '.mp3' }] },
           ].map(folder => (
             <div key={folder.label} style={{ padding: '10px 10px 4px' }}>

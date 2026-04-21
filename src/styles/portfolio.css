@@ -92,7 +92,10 @@
   right: 6px;
   width: 154px;
   height: 92px;
-  pointer-events: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
   z-index: 3;
   filter: drop-shadow(0 8px 16px rgba(107, 33, 168, 0.18));
   transform: scaleX(-1);
@@ -113,10 +116,6 @@
   clip-path: polygon(34% 28%, 67% 28%, 74% 100%, 28% 100%);
 }
 
-.p-readme-bat-wing-layer {
-  will-change: transform;
-}
-
 .p-readme-bat-wing-layer-left {
   clip-path: polygon(0% 0%, 52% 0%, 54% 100%, 0% 100%);
   transform-origin: 57% 54%;
@@ -127,6 +126,54 @@
   transform-origin: 43% 54%;
 }
 
+.p-readme-bat-bubble {
+  position: absolute;
+  right: auto;
+  left: 126px;
+  top: 4px;
+  transform: scaleX(-1);
+  z-index: 4;
+  padding: 8px 12px;
+  border: 1px solid var(--p-accent2);
+  border-radius: 999px;
+  background: var(--p-panel);
+  color: var(--p-accent2);
+  font-family: var(--p-mono);
+  font-size: 10px;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.16s ease, translate 0.16s ease;
+  translate: 8px 4px;
+}
+.p-readme-bat:hover .p-readme-bat-bubble,
+.p-readme-bat:focus-visible .p-readme-bat-bubble {
+  opacity: 1;
+  translate: 0 0;
+}
+.p-readme-bat-bubble::before,
+.p-readme-bat-bubble::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: var(--p-panel);
+  border: 1px solid var(--p-accent2);
+}
+.p-readme-bat-bubble::before {
+  right: -12px;
+  bottom: -5px;
+  width: 9px;
+  height: 9px;
+}
+.p-readme-bat-bubble::after {
+  right: -22px;
+  bottom: -13px;
+  width: 5px;
+  height: 5px;
+}
+
 @keyframes p-bat-flap-left {
   0%, 100% { transform: rotate(0deg) translateY(0); }
   50% { transform: rotate(-7deg) translateY(-2px); }
@@ -135,6 +182,16 @@
 @keyframes p-bat-flap-right {
   0%, 100% { transform: rotate(0deg) translateY(0); }
   50% { transform: rotate(7deg) translateY(-2px); }
+}
+
+@media (min-width: 769px) {
+  .p-readme-bat-wing-layer-left {
+    animation: p-bat-flap-left 0.72s steps(2, end) infinite;
+  }
+
+  .p-readme-bat-wing-layer-right {
+    animation: p-bat-flap-right 0.72s steps(2, end) infinite;
+  }
 }
 
 .p-binary-photo {
@@ -387,6 +444,36 @@
 .p-proj-name { transition: color 0.15s ease; }
 .p-proj-preview { transition: transform 0.2s ease, border-color 0.2s ease; }
 .p-proj-tag { transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease; }
+.p-proj-loading-bar {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  min-height: 76px;
+  cursor: default;
+  color: var(--p-muted);
+  background:
+    linear-gradient(90deg, transparent, rgba(212,251,60,0.05), transparent),
+    transparent;
+  letter-spacing: 0.01em;
+}
+.p-proj-loading-bar:hover {
+  background:
+    linear-gradient(90deg, transparent, rgba(212,251,60,0.05), transparent),
+    transparent;
+  padding-left: 12px;
+}
+.p-proj-loading-spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(122,122,130,0.45);
+  border-top-color: var(--p-accent2);
+  border-radius: 50%;
+  animation: p-loading-spin 0.9s linear infinite;
+}
+
+@keyframes p-loading-spin {
+  to { transform: rotate(360deg); }
+}
 
 /* ===== Stack ===== */
 .p-stack-cell {
@@ -1022,15 +1109,6 @@
   }
 }
 
-@media (min-width: 769px) {
-  .p-readme-bat-wing-layer-left {
-    animation: p-bat-flap-left 1.15s steps(2, end) infinite;
-  }
-
-  .p-readme-bat-wing-layer-right {
-    animation: p-bat-flap-right 1.15s steps(2, end) infinite;
-  }
-}
 
 
 @media (max-width: 640px) {
