@@ -1072,7 +1072,6 @@
   text-align: center;
   text-decoration: none;
   text-transform: none;
-  transition: transform 0.16s ease;
 }
 .p-vibes-code-line {
   display: block;
@@ -1085,10 +1084,6 @@
 .p-vibes-code-name { color: #ff8a4c; }
 .p-vibes-code-op { color: var(--p-muted); }
 .p-vibes-code-string { color: var(--p-accent2); }
-.p-vibes-pixel-cta:hover {
-  transform: translateY(-2px);
-}
-
 /* ===== Telegram CTA ===== */
 .p-tg-cta {
   display: inline-flex;

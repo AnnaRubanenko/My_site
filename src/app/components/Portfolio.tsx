@@ -601,7 +601,7 @@ function VibesSection({ d }: { d: LangData }) {
           <span aria-hidden="true">↗</span>
         </span>
       </a>
-      <a href="#contact" className="p-vibes-pixel-cta">
+      <div className="p-vibes-pixel-cta" aria-hidden="true">
         <code className="p-vibes-code-line">
           <span className="p-vibes-code-kw">const</span>{' '}
           <span className="p-vibes-code-name">message</span>{' '}
@@ -609,7 +609,7 @@ function VibesSection({ d }: { d: LangData }) {
           <span className="p-vibes-code-string">&quot;let&apos;s build something awesome&quot;</span>
           <span className="p-vibes-code-op">;</span>
         </code>
-      </a>
+      </div>
     </section>
   );
 }
