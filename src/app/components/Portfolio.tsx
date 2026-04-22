@@ -61,9 +61,32 @@ function SectionHead({ title, ext, meta }: { title: string; ext: string; meta: s
 }
 
 function PixelBat() {
+  const batPhrases = [
+    'SHAROOOOOOOOOON!',
+    "ROCK'N ROLL!!!",
+    'OZZY APPROVES',
+    'ONE MORE CASE!',
+  ];
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [phraseIndex, setPhraseIndex] = useState(0);
+
+  const nextPhrase = () => {
+    setPhraseIndex(index => (index + 1) % batPhrases.length);
+  };
+
   return (
-    <button className="p-readme-bat" type="button" aria-label="rock n roll bat">
-      <span className="p-readme-bat-bubble">ROCK'N ROLL!!!</span>
+    <button
+      className={`p-readme-bat${isSpeaking ? ' is-speaking' : ''}`}
+      type="button"
+      aria-label="rock n roll bat"
+      aria-pressed={isSpeaking}
+      onMouseEnter={nextPhrase}
+      onClick={() => {
+        nextPhrase();
+        setIsSpeaking(show => !show);
+      }}
+    >
+      <span className="p-readme-bat-bubble">{batPhrases[phraseIndex]}</span>
       <img src="/portfolio/bat.png" alt="" className="p-readme-bat-img p-readme-bat-body" />
       <img src="/portfolio/bat.png" alt="" className="p-readme-bat-img p-readme-bat-wing-layer p-readme-bat-wing-layer-left" />
       <img src="/portfolio/bat.png" alt="" className="p-readme-bat-img p-readme-bat-wing-layer p-readme-bat-wing-layer-right" />
@@ -74,49 +97,19 @@ function PixelBat() {
 // ── README section ────────────────────────────────────────────────────────────
 
 function ReadmeSection({ d }: { d: LangData }) {
-  const segs = [d.h1Line1, d.h1Line2, d.lede];
-  const lens = segs.map(s => s.length);
-  const total = lens[0] + lens[1] + lens[2];
-
-  const shouldAnimate = useRef(
-    window.innerWidth > 768 && !localStorage.getItem('portfolio-typed')
-  ).current;
-
-  const [count, setCount] = useState(shouldAnimate ? 0 : total);
-  const done = count >= total;
-
-  useEffect(() => {
-    if (!shouldAnimate || done) return;
-    const id = setInterval(() => setCount((c: number) => Math.min(c + 1, total)), 22);
-    return () => clearInterval(id);
-  }, []);
-
-  useEffect(() => {
-    if (done && shouldAnimate) localStorage.setItem('portfolio-typed', '1');
-  }, [done]);
-
-  let r = count;
-  const t0 = segs[0].slice(0, Math.min(r, lens[0])); r = Math.max(0, r - lens[0]);
-  const t1 = segs[1].slice(0, Math.min(r, lens[1])); r = Math.max(0, r - lens[1]);
-  const t2 = segs[2].slice(0, r);
-
-  const seg = count < lens[0] ? 0 : count < lens[0] + lens[1] ? 1 : 2;
-  const cur = !done ? <span className="p-type-cursor" /> : null;
-
   return (
     <section id="readme" style={{ scrollMarginTop: 60 }}>
       <div className="p-readme-marker" style={{ fontSize: 11, color: C.muted, marginBottom: 14, fontFamily: C.mono }}>
         <b style={{ color: C.muted, fontWeight: 500 }}>{d.secMarker}</b>
       </div>
 
-      <div className="p-readme-head" style={{ display: 'grid', gridTemplateColumns: '1fr minmax(0, 340px)', gap: 30, alignItems: 'start' }}>
+      <div className="p-readme-head" style={{ display: 'grid', gridTemplateColumns: '1fr minmax(0, 340px)', gap: 30, alignItems: 'end' }}>
         <div>
           <h1 style={{ fontFamily: C.sans, fontSize: 'clamp(38px, 6vw, 56px)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1, margin: '0 0 14px', color: C.ink }}>
-            {t0}{seg === 0 ? cur : null}<br />
-            <span style={{ color: C.accent2 }}>{t1}{seg === 1 ? cur : null}</span>
+            {d.h1Line1}: <span style={{ color: C.accent2 }}>{d.h1Line2}</span>
           </h1>
           <p style={{ fontFamily: C.sans, fontSize: 18, lineHeight: 1.55, color: C.ink, maxWidth: 620, margin: 0, whiteSpace: 'pre-line' }}>
-            {t2}{seg === 2 ? cur : null}
+            {d.lede}
           </p>
           <a href="https://t.me/annademeshko" target="_blank" rel="noopener" className="p-tg-cta">
             <svg width={14} height={14} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
@@ -191,37 +184,27 @@ function ProjectRow({ p, idx, onOpenCase }: { p: Project; idx: number; onOpenCas
         </div>
         <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.4 }}>{p.problem}</div>
       </div>
-      <div className="p-proj-tags-col" style={{ display: 'flex', gap: 4, flexWrap: 'wrap' as const }}>
-        {p.tags.map(t => (
-          <span key={t} style={{
-            fontSize: 9, padding: '2px 6px',
-            border: `1px solid ${hovered ? C.accent2 : C.line}`,
-            borderRadius: 2,
-            color: hovered ? C.accent2 : C.muted,
-            background: hovered ? 'rgba(212,251,60,0.08)' : 'transparent',
-            textTransform: 'lowercase' as const,
-            fontFamily: C.mono,
-            transition: 'color 0.15s ease, border-color 0.15s ease, background 0.15s ease',
-          }}>
-            {t}
-          </span>
-        ))}
-      </div>
-      <div style={{ fontFamily: C.sans, fontSize: 18, fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1 }}>
-        <span style={{ color: C.accent2 }}>{p.metric.value}</span>
-        <span style={{ display: 'block', fontFamily: C.mono, fontSize: 10, color: C.muted, fontWeight: 400, marginTop: 4 }}>{p.metric.label}</span>
-      </div>
-      <div
-        className={`pv-${p.cover}`}
-        style={{
-          width: 74, height: 46, borderRadius: 3,
-          border: `1px solid ${hovered ? C.accent2 : C.line}`,
-          position: 'relative' as const, overflow: 'hidden', flexShrink: 0,
-          transform: hovered ? 'scale(1.05)' : 'scale(1)',
-          transition: 'transform 0.2s ease, border-color 0.2s ease',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-        }}
-      >
+      <div className="p-proj-meta-row">
+        <div className="p-proj-tags-col" style={{ display: 'flex', gap: 4, flexWrap: 'wrap' as const }}>
+          {p.tags.map(t => (
+            <span key={t} style={{
+              fontSize: 9, padding: '2px 6px',
+              border: `1px solid ${hovered ? C.accent2 : C.line}`,
+              borderRadius: 2,
+              color: hovered ? C.accent2 : C.muted,
+              background: hovered ? 'rgba(212,251,60,0.08)' : 'transparent',
+              textTransform: 'lowercase' as const,
+              fontFamily: C.mono,
+              transition: 'color 0.15s ease, border-color 0.15s ease, background 0.15s ease',
+            }}>
+              {t}
+            </span>
+          ))}
+        </div>
+        <div className="p-proj-metric" style={{ fontFamily: C.sans, fontSize: 18, fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1 }}>
+          <span style={{ color: C.accent2 }}>{p.metric.value}</span>
+          <span style={{ display: 'block', fontFamily: C.mono, fontSize: 10, color: C.muted, fontWeight: 400, marginTop: 4 }}>{p.metric.label}</span>
+        </div>
       </div>
     </button>
   );
@@ -262,6 +245,156 @@ function StackSection({ d }: { d: LangData }) {
       <SectionHead title={d.secStackTitle} ext=".json" meta={d.secStackMeta} />
       <div className="p-stack-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(8, 1fr)', gap: 8 }}>
         {d.stack.map(s => <StackCell key={s.name} s={s} />)}
+      </div>
+    </section>
+  );
+}
+
+// ── CV view ───────────────────────────────────────────────────────────────────
+
+function CvView({ d, lang, onBack }: { d: LangData; lang: Lang; onBack: () => void }) {
+  const visibleTools = d.stack.filter(s => !s.name.includes('loading') && !s.name.includes('загрузка'));
+
+  function CvContactRow({ c }: { c: { label: string; value: string; href?: string } }) {
+    const [copied, setCopied] = useState(false);
+    const [hovered, setHovered] = useState(false);
+    const isEmail = c.href?.startsWith('mailto:');
+
+    const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+      if (!isEmail) return;
+      e.preventDefault();
+      navigator.clipboard.writeText(c.value).then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      });
+    };
+
+    return (
+      <a
+        href={c.href || '#'}
+        className="p-cv-contact"
+        target={!isEmail && c.href?.startsWith('http') ? '_blank' : undefined}
+        rel="noreferrer"
+        onClick={handleClick}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+      >
+        <span>{c.label}</span>
+        <strong>{c.value}</strong>
+        {isEmail && hovered && (
+          <em className="p-cv-contact-tip">{copied ? d.tooltipCopied : d.tooltipCopy}</em>
+        )}
+      </a>
+    );
+  }
+
+  return (
+    <section id="cv" className="p-cv-section p-cv-page" style={{ display: 'flex', flexDirection: 'column', gap: 16, scrollMarginTop: 60 }}>
+      <button className="p-case-back" onClick={onBack}>← {d.caseBackLabel}</button>
+
+      <div className="p-cv-shell">
+        <div className="p-cv-top">
+          <div className="p-cv-person">
+            <img src={d.cv.photoSrc} alt={d.name} className="p-cv-photo" />
+            <div>
+              <h2 className="p-cv-name">{d.name}</h2>
+              <p className="p-cv-role">{d.cv.headline}</p>
+            </div>
+          </div>
+          <a href="/portfolio/anna-demeshko-cv.pdf" download className="p-cv-download">
+            {d.cv.downloadLabel}
+          </a>
+        </div>
+
+        <div className="p-cv-grid">
+          <aside className="p-cv-aside">
+            <div className="p-cv-block">
+              <h3>{d.cv.contactTitle}</h3>
+              {d.cv.contactRows.map(c => (
+                <CvContactRow key={c.label} c={c} />
+              ))}
+            </div>
+
+            <div className="p-cv-block">
+              <h3>{d.cv.toolsTitle}</h3>
+              <div className="p-cv-tags">
+                {visibleTools.map(s => (
+                  <span key={s.name}>{s.name}</span>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-cv-block">
+              <h3>{d.cv.languagesTitle}</h3>
+              <ul className="p-cv-list">
+                {d.cv.languages.map(item => <li key={item}>{item}</li>)}
+              </ul>
+            </div>
+
+            <div className="p-cv-block">
+              <h3>{d.cv.hardSkillsTitle}</h3>
+              <ul className="p-cv-list">
+                {d.cv.hardSkills.map(item => <li key={item.title}>{item.title}</li>)}
+              </ul>
+            </div>
+
+            <div className="p-cv-block">
+              <h3>{d.cv.softSkillsTitle}</h3>
+              <ul className="p-cv-list">
+                {d.cv.softSkills.map(item => <li key={item}>{item}</li>)}
+              </ul>
+            </div>
+          </aside>
+
+          <div className="p-cv-main">
+            <div className="p-cv-block">
+              <h3>{lang === 'ru' ? 'профиль' : 'profile'}</h3>
+              <p className="p-cv-summary">{d.cv.summary}</p>
+              <p className="p-cv-availability">{d.cv.availability}</p>
+            </div>
+
+            <div className="p-cv-block">
+              <h3>{lang === 'ru' ? 'ключевые факты' : 'key facts'}</h3>
+              <ul className="p-cv-list p-cv-list-grid">
+                {d.cv.highlights.map(item => <li key={item}>{item}</li>)}
+              </ul>
+            </div>
+
+            <div className="p-cv-block">
+              <h3>{d.cv.experienceTitle}</h3>
+              <div className="p-cv-timeline">
+                {d.cv.experience.map(job => (
+                  <article key={`${job.role}-${job.period}`} className="p-cv-job">
+                    <div className="p-cv-job-head">
+                      <h4>{job.role}</h4>
+                      <p>{job.company}</p>
+                    </div>
+                    <span>{job.period}</span>
+                    <ul className="p-cv-list">
+                      {job.details.map(item => <li key={item}>{item}</li>)}
+                    </ul>
+                  </article>
+                ))}
+              </div>
+            </div>
+
+            <div className="p-cv-block">
+              <h3>{d.cv.educationTitle}</h3>
+              <div className="p-cv-education">
+                {d.cv.education.map(item => (
+                  <article key={`${item.title}-${item.period}`}>
+                    <div className="p-cv-education-head">
+                      <h4>{item.title}</h4>
+                      <p>{item.place}</p>
+                    </div>
+                    <span>{item.period}</span>
+                  </article>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </div>
       </div>
     </section>
   );
@@ -437,8 +570,11 @@ function VibesSection({ d }: { d: LangData }) {
             }}
           />
           <div style={{ minWidth: 0 }}>
-            <div style={{ fontFamily: C.mono, fontSize: 11, color: 'rgba(232,232,234,0.72)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            <div className="p-vibes-label" style={{ fontFamily: C.mono, fontSize: 11, color: 'rgba(232,232,234,0.72)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
               {d.vibesLabel}
+            </div>
+            <div className="p-vibes-eq" aria-label={d.vibesLabel}>
+              {[1, 2, 3, 4].map(bar => <span key={bar} className="p-eq-bar" />)}
             </div>
             <div style={{ color: C.ink, fontSize: 16, lineHeight: 1.25, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {d.vibesPlaylistTitle}
@@ -449,6 +585,7 @@ function VibesSection({ d }: { d: LangData }) {
           </div>
         </div>
         <span
+          className="p-vibes-cta"
           style={{
             color: '#0c0c0d',
             background: '#1db954',
@@ -460,8 +597,18 @@ function VibesSection({ d }: { d: LangData }) {
             flexShrink: 0,
           }}
         >
-          {d.vibesPlaylistCta} ↗
+          <span className="p-vibes-cta-text">{d.vibesPlaylistCta}</span>
+          <span aria-hidden="true">↗</span>
         </span>
+      </a>
+      <a href="#contact" className="p-vibes-pixel-cta">
+        <code className="p-vibes-code-line">
+          <span className="p-vibes-code-kw">const</span>{' '}
+          <span className="p-vibes-code-name">message</span>{' '}
+          <span className="p-vibes-code-op">=</span>{' '}
+          <span className="p-vibes-code-string">&quot;let&apos;s build something awesome&quot;</span>
+          <span className="p-vibes-code-op">;</span>
+        </code>
       </a>
     </section>
   );
@@ -525,10 +672,16 @@ function CaseView({ project, d, onBack }: { project: Project; d: LangData; onBac
         <span style={{ color: C.dim, fontWeight: 300, fontSize: '0.55em', fontFamily: C.mono, letterSpacing: 0, marginLeft: 6, verticalAlign: 'middle', opacity: 0.7 }}>.case</span>
       </h1>
 
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: -6 }}>
-        {project.tags.map(t => (
-          <span key={t} style={{ fontFamily: C.mono, fontSize: 13, padding: '5px 14px', border: `1px solid ${C.line}`, borderRadius: 999, color: C.accent2, background: 'rgba(212,251,60,0.04)', textTransform: 'lowercase' }}>{t}</span>
-        ))}
+      <div className="p-case-meta-row">
+        <div className="p-case-tags">
+          {project.tags.map(t => (
+            <span key={t} style={{ fontFamily: C.mono, fontSize: 13, padding: '5px 14px', border: `1px solid ${C.line}`, borderRadius: 999, color: C.accent2, background: 'rgba(212,251,60,0.04)', textTransform: 'lowercase' }}>{t}</span>
+          ))}
+        </div>
+        <div className="p-case-metric">
+          <span>{project.metric.value}</span>
+          <span>{project.metric.label}</span>
+        </div>
       </div>
 
       {/* Screen widget */}
@@ -599,7 +752,8 @@ export function Portfolio() {
     return 'en';
   });
   const [currentCase, setCurrentCase] = useState<string | null>(null);
-  const [activeSection, setActiveSection] = useState('readme');
+  const [cvOpen, setCvOpen] = useState(() => window.location.hash === '#cv');
+  const [activeSections, setActiveSections] = useState<string[]>(['readme']);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const mainRef = useRef<HTMLDivElement>(null);
   const d = DATA[lang];
@@ -611,7 +765,9 @@ export function Portfolio() {
   }, []);
 
   const openCase = useCallback((id: string) => {
+    setCvOpen(false);
     setCurrentCase(id);
+    if (window.location.hash) history.replaceState(null, '', window.location.pathname);
     requestAnimationFrame(() => mainRef.current?.scrollTo({ top: 0 }));
   }, []);
 
@@ -620,6 +776,20 @@ export function Portfolio() {
     setCurrentCase(null);
     requestAnimationFrame(() => { if (wasId) scrollToSection(wasId); });
   }, [currentCase, scrollToSection]);
+
+  const openCv = useCallback(() => {
+    setCurrentCase(null);
+    setCvOpen(true);
+    history.replaceState(null, '', '#cv');
+    requestAnimationFrame(() => mainRef.current?.scrollTo({ top: 0 }));
+  }, []);
+
+  const openPortfolio = useCallback(() => {
+    setCvOpen(false);
+    setCurrentCase(null);
+    history.replaceState(null, '', window.location.pathname);
+    requestAnimationFrame(() => scrollToSection('readme'));
+  }, [scrollToSection]);
 
   const switchLang = (l: Lang) => {
     setLang(l);
@@ -654,16 +824,29 @@ export function Portfolio() {
     const main = mainRef.current;
     if (!main) return;
     const update = () => {
-      if (currentCase) return;
+      if (currentCase || cvOpen) return;
       const sections = Array.from(main.querySelectorAll<HTMLElement>('#editor > section'));
       const scrollTop = main.scrollTop;
       const threshold = 80;
+      const viewportHeight = main.clientHeight;
+      const visibleIds = sections
+        .filter(sec => {
+          const top = sec.offsetTop - scrollTop;
+          const bottom = top + sec.offsetHeight;
+          return bottom > threshold && top < viewportHeight - threshold;
+        })
+        .map(sec => sec.id);
       let activeId = sections[0]?.id || 'readme';
       for (const sec of sections) {
         if (sec.offsetTop - threshold <= scrollTop) activeId = sec.id;
         else break;
       }
-      setActiveSection(activeId);
+      const next = visibleIds.length ? visibleIds : [activeId];
+      setActiveSections(prev => (
+        prev.length === next.length && prev.every((id, i) => id === next[i])
+          ? prev
+          : next
+      ));
     };
     let ticking = false;
     const onScroll = () => {
@@ -672,13 +855,13 @@ export function Portfolio() {
     main.addEventListener('scroll', onScroll);
     update();
     return () => main.removeEventListener('scroll', onScroll);
-  }, [currentCase]);
+  }, [currentCase, cvOpen]);
 
   const currentProject = currentCase ? d.projects.find(p => p.id === currentCase) : null;
 
   // Sidebar tree item
   function TreeItem({ id, icon, name, ext, isProject = false, href }: { id: string; icon: string; name: string; ext: string; isProject?: boolean; href?: string }) {
-    const isActive = currentCase ? (isProject && id === currentCase) : (!isProject && id === activeSection);
+    const isActive = cvOpen ? id === 'cv' : (currentCase ? (isProject && id === currentCase) : (!isProject && activeSections.includes(id)));
     const inner = (
       <>
         <span className="p-tico" style={{ width: 12, display: 'inline-block', flexShrink: 0, fontSize: 10, lineHeight: '10px', textAlign: 'center' }}>{icon}</span>
@@ -699,8 +882,13 @@ export function Portfolio() {
         onClick={() => {
           setSidebarOpen(false);
           if (isProject) { openCase(id); }
-          else if (currentCase) { setCurrentCase(null); requestAnimationFrame(() => scrollToSection(id)); }
-          else { scrollToSection(id); }
+          else if (id === 'cv') { openCv(); }
+          else if (currentCase || cvOpen) {
+            setCurrentCase(null);
+            setCvOpen(false);
+            if (window.location.hash) history.replaceState(null, '', window.location.pathname);
+            requestAnimationFrame(() => scrollToSection(id));
+          } else { scrollToSection(id); }
         }}
         style={{ width: '100%', textAlign: 'left', background: 'transparent', border: 'none' }}
       >
@@ -723,7 +911,7 @@ export function Portfolio() {
             </svg>
           </button>
           <MacDots />
-          <span className="p-header-title" style={{ color: C.ink }}>~/portfolio/<b style={{ color: C.accent2, fontWeight: 500 }}>{currentCase ? `${currentCase}.case` : 'анна_демешко.fig'}</b></span>
+          <span className="p-header-title" style={{ color: C.ink }}>~/portfolio/<b style={{ color: C.accent2, fontWeight: 500 }}>{currentCase ? `${currentCase}.case` : (cvOpen ? 'anna_demeshko.cv.pdf' : 'анна_демешко.fig')}</b></span>
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 14, alignItems: 'center' }}>
             <span className="p-header-meta" style={{ opacity: 0.7 }}>{d.ln}</span>
             <span className="p-header-meta" style={{ opacity: 0.7 }}>utf-8</span>
@@ -739,9 +927,9 @@ export function Portfolio() {
         {/* Sidebar */}
         <aside className={`p-sidebar${sidebarOpen ? ' p-sidebar-open' : ''}`} style={{ gridArea: 'side', background: C.panel, borderRight: `1px solid ${C.line}`, overflowY: 'auto', padding: '8px 0 20px' }}>
           {[
-            { label: d.folderAbout, items: [{ id: 'readme', icon: '☰', name: 'readme', ext: '.md' }, { id: 'stack', icon: '☰', name: 'stack', ext: '.json' }, { id: 'cv', icon: '↓', name: 'cv', ext: '.pdf', href: '#' }] },
+            { label: d.folderAbout, items: [{ id: 'readme', icon: '☰', name: 'readme', ext: '.md' }, { id: 'cv', icon: '▣', name: 'cv', ext: '.pdf' }, { id: 'stack', icon: '☰', name: 'stack', ext: '.json' }] },
             { label: d.folderProjects, items: d.projects.filter(p => !p.isLoading).map(p => ({ id: p.id, icon: '◆', name: p.id, ext: '.case', isProject: true })) },
-            { label: d.folderEtc, items: [{ id: 'contact', icon: '@', name: 'contact', ext: '.md' }, { id: 'vibes', icon: '♪', name: 'vibes', ext: '.mp3' }] },
+            { label: d.folderEtc, items: [{ id: 'contact', icon: '@', name: 'contact', ext: '.md' }, { id: 'vibes', icon: '♪', name: 'now playing', ext: '.mp3' }] },
           ].map(folder => (
             <div key={folder.label} style={{ padding: '10px 10px 4px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 6, padding: '5px 10px 5px 4px', fontSize: 10, color: C.muted, textTransform: 'uppercase', letterSpacing: '0.08em', userSelect: 'none' }}>
@@ -758,9 +946,11 @@ export function Portfolio() {
         <main className="p-main" ref={mainRef} style={{ gridArea: 'main', overflowY: 'auto', scrollBehavior: 'smooth', background: C.bg, minWidth: 0 }}>
 
           {/* Editor */}
-          <div className="p-editor" id="editor" style={{ padding: '24px 40px 120px', maxWidth: 980, margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: 36 }}>
+          <div className="p-editor" id="editor" style={{ padding: '24px 40px 48px', maxWidth: 980, margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: 36 }}>
             {currentCase && currentProject ? (
               <CaseView project={currentProject} d={d} onBack={closeCase} />
+            ) : cvOpen ? (
+              <CvView d={d} lang={lang} onBack={openPortfolio} />
             ) : (
               <>
                 <ReadmeSection d={d} />
@@ -775,16 +965,16 @@ export function Portfolio() {
 
         {/* Status bar / Mobile nav */}
         <footer className="p-statusbar" style={{ gridArea: 'status', background: C.accent, color: '#fff', display: 'flex', alignItems: 'center', padding: '0 14px', gap: 14, fontSize: 10, letterSpacing: '0.04em', fontFamily: C.mono }}>
-          <span className="p-blink">●</span>
-          <span>{d.statReady}</span>
+          <span className="p-blink" style={{ color: '#22c55e' }}>●</span>
+          <span className="p-blink" style={{ color: '#22c55e' }}>{d.statReady}</span>
           <span style={{ opacity: 0.4 }}>|</span>
           <span>branch: main</span>
           <span style={{ opacity: 0.4 }}>|</span>
-          <span>📍 gmt+3</span>
+          <span>📍 somewhere on Earth</span>
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 14 }}>
-            <span>@anna_demeshko</span>
+            <span>built in figma</span>
             <span style={{ opacity: 0.4 }}>|</span>
-            <span>hi@demeshko.design</span>
+            <span>made with caffeine</span>
           </div>
         </footer>
 
@@ -793,15 +983,20 @@ export function Portfolio() {
           {[
             { id: 'readme', label: 'About' },
             { id: 'projects', label: 'Projects' },
+            { id: 'cv', label: 'CV' },
             { id: 'contact', label: 'Contact' },
           ].map((item, idx, arr) => (
             <button
               key={item.id}
-              className={`p-mobile-nav-btn${!currentCase && activeSection === item.id ? ' p-active' : ''}`}
+              className={`p-mobile-nav-btn${(item.id === 'cv' ? cvOpen : (!currentCase && !cvOpen && activeSections.includes(item.id))) ? ' p-active' : ''}`}
               onClick={() => {
                 setSidebarOpen(false);
-                if (currentCase) {
+                if (item.id === 'cv') {
+                  openCv();
+                } else if (currentCase || cvOpen) {
                   setCurrentCase(null);
+                  setCvOpen(false);
+                  if (window.location.hash) history.replaceState(null, '', window.location.pathname);
                   requestAnimationFrame(() => scrollToSection(item.id));
                 } else {
                   scrollToSection(item.id);

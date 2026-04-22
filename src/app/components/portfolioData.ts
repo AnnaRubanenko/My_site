@@ -35,6 +35,8 @@ export interface LangData {
   ctaTelegram: string;
   secProjectsTitle: string;
   secProjectsMeta: string;
+  secCvTitle: string;
+  secCvMeta: string;
   secStackTitle: string;
   secStackMeta: string;
   secContactTitle: string;
@@ -64,6 +66,34 @@ export interface LangData {
   tooltipCopy: string;
   tooltipCopied: string;
   tooltipNavigate: string;
+  cv: {
+    downloadLabel: string;
+    photoSrc: string;
+    headline: string;
+    summary: string;
+    availability: string;
+    portfolioLabel: string;
+    portfolioHref: string;
+    contactTitle: string;
+    contactRows: { label: string; value: string; href?: string }[];
+    highlights: string[];
+    experienceTitle: string;
+    experience: {
+      role: string;
+      company: string;
+      period: string;
+      details: string[];
+    }[];
+    educationTitle: string;
+    education: { title: string; place: string; period: string }[];
+    toolsTitle: string;
+    softSkillsTitle: string;
+    softSkills: string[];
+    hardSkillsTitle: string;
+    hardSkills: { title: string; description: string }[];
+    languagesTitle: string;
+    languages: string[];
+  };
   stack: { short: string; name: string; skills: string[] }[];
   contacts: { label: string; value: string; href: string }[];
   tracks: string[];
@@ -75,17 +105,18 @@ export const DATA: Record<Lang, LangData> = {
     name: 'Анна Демешко',
     filename: 'демешко.readme',
     role: 'product designer',
-    h1Line1: 'анна демешко is',
+    h1Line1: 'анна демешко',
     h1Line2: 'product designer',
     ledeHi: '',
     lede: 'превращаю сложные процессы в понятные, удобные и красивые продукты, crm системы — моя страсть\n\nлюблю свою работу, музыку Оззи Осборна и философию Мишеля Монтеня',
     stats: {
-      'projects shipped': '10+',
-      'case studies': '7',
-      experience: 'enterprise / saas / b2b / b2c',
-      'open to': 'full-time',
-      location: 'remote, gmt+3',
-      languages: 'ru · en',
+      'запущено проектов': '10+',
+      'кейсов': '4 (15)',
+      'опыт работы': '3+ года',
+      'домены': 'enterprise / saas / b2b / b2c',
+      'формат работы': 'full-time',
+      'локация': 'remote, gmt+3',
+      'языки': 'ru · en',
     },
     secMarker: '# readme.md · обновлено 19.04.2026',
     codeStrengths: [
@@ -100,6 +131,8 @@ export const DATA: Record<Lang, LangData> = {
     ctaTelegram: 'написать в телеграм',
     secProjectsTitle: 'projects/study_case',
     secProjectsMeta: 'исследования / синки / макеты / тесты => довольные пользователи',
+    secCvTitle: 'cv',
+    secCvMeta: 'короткая версия для рекрутера',
     secStackTitle: 'stack',
     secStackMeta: 'набила руку',
     secContactTitle: 'contact',
@@ -116,10 +149,10 @@ export const DATA: Record<Lang, LangData> = {
     folderAbout: 'about',
     folderProjects: 'projects/study_case/',
     folderEtc: 'etc/',
-    statReady: 'ready',
+    statReady: 'open to work',
     ln: 'стр 1, кол 1',
     caseStudyLabel: 'case study',
-    caseBackLabel: 'к списку проектов',
+    caseBackLabel: 'к главной',
     caseTaskLabel: 'задача',
     caseProblemLabel: 'проблема',
     caseSolutionLabel: 'решение',
@@ -129,6 +162,75 @@ export const DATA: Record<Lang, LangData> = {
     tooltipCopy: 'нажми, чтобы скопировать',
     tooltipCopied: 'скопировано!',
     tooltipNavigate: 'нажми, чтобы перейти',
+    cv: {
+      downloadLabel: 'скачать PDF',
+      photoSrc: '/portfolio/profile-binary-source.png',
+      headline: 'Product Designer',
+      summary: 'Специализируюсь на B2B и B2C продуктах в сфере информационной безопасности, где важны логика, структура и удобство взаимодействия. Создаю интерфейсы с продуманными сценариями, очевидной логикой и чистым дизайном. Хорошо взаимодействую с PM-ами, разработчиками и аналитиками на всех этапах.',
+      availability: 'Открыта к full-time формату, remote, GMT+3.',
+      portfolioLabel: 'смотреть портфолио',
+      portfolioHref: '#readme',
+      contactTitle: 'контакты',
+      contactRows: [
+        { label: 'телефон/тг', value: '+7 963 316 2580', href: 'https://t.me/annademeshko' },
+        { label: 'email', value: 'aneyta@mail.ru', href: 'mailto:aneyta@mail.ru' },
+      ],
+      highlights: [
+        '10+ запущенных продуктовых проектов',
+        'B2B / B2C / SaaS / enterprise',
+        'сложные таблицы, формы, фильтры и дашборды',
+        'исследования, прототипы, дизайн-системы и handoff',
+      ],
+      experienceTitle: 'опыт работы',
+      experience: [
+        {
+          role: 'Product Designer',
+          company: 'AppSec Solutions',
+          period: 'февр. 2025 — март 2026 · 1 г. 2 мес.',
+          details: [
+            'проектировала высоконагруженные интерфейсы для B2B-продуктов в сфере информационной безопасности',
+            'прорабатывала пользовательский опыт от user flows и wireframes до high-fidelity прототипов',
+            'участвовала в создании дизайн-системы: компоненты, состояния, спецификации, Storybook и переезд на Taiga UI',
+            'коммуницировала с продуктовыми менеджерами, разработчиками и аналитиками на всех этапах проектирования',
+            'редизайнила и улучшала веб-экосистему продукта: дашборды, формы, фильтры, таблицы и сложные UI-компоненты',
+            'управляла несколькими задачами параллельно, контролируя сроки, качество и консистентность решений',
+          ],
+        },
+        {
+          role: 'UX / UI Designer',
+          company: 'Grokhotov studio',
+          period: 'март 2024 — янв. 2025 · 11 мес.',
+          details: [
+            'разрабатывала wireframes, макеты и интерактивные прототипы для презентации решений команде разработки и заказчикам',
+            'создавала адаптивные дизайны, редизайнила существующие интерфейсы и улучшала пользовательские пути',
+            'поддерживала и обновляла дизайн-системы и UI-киты, сохраняя консистентность интерфейсов',
+            'проводила usability-тестирования, собирала обратную связь и внедряла улучшения в интерфейсы',
+          ],
+        },
+      ],
+      educationTitle: 'образование',
+      education: [
+        { title: 'UX Researcher', place: 'Google UX Design', period: 'нояб. 2025 — фев. 2026' },
+        { title: 'UX / UI Designer', place: 'UPROCK SCHOOL', period: 'март 2024 — сент. 2024' },
+        { title: 'Аналитик ИБ', place: 'Университет ИТМО', period: 'сент. 2020 — июнь 2022' },
+        { title: 'Прикладной лингвист', place: 'СПбГУАП', period: 'сент. 2014 — июнь 2018' },
+      ],
+      toolsTitle: 'инструменты работы',
+      softSkillsTitle: 'софт скиллс',
+      softSkills: ['креативность', 'работа в команде', 'суперкоммуникация', 'самообучение', 'позитивность', 'умение аргументировать'],
+      hardSkillsTitle: 'хард скиллс',
+      hardSkills: [
+        { title: 'Product Discovery', description: '' },
+        { title: 'UX Research', description: '' },
+        { title: 'Usability Testing', description: '' },
+        { title: 'Information Architecture', description: '' },
+        { title: 'Interaction Design', description: '' },
+        { title: 'Design Systems', description: '' },
+        { title: 'Data-heavy Interfaces', description: '' },
+      ],
+      languagesTitle: 'языки',
+      languages: ['русский — native', 'английский — B2 (intermediate)'],
+    },
     stack: [
       { short: 'Fi', name: 'figma',          skills: ['auto layout', 'компоненты и варианты', 'дизайн-токены', 'прототипирование', 'dev mode', 'переменные'] },
       { short: 'Ae', name: 'after effects',   skills: ['UI-анимации', 'motion graphics', 'экспорт Lottie'] },
@@ -261,13 +363,14 @@ export const DATA: Record<Lang, LangData> = {
     name: 'Anna Demeshko',
     filename: 'demeshko.readme',
     role: 'product designer',
-    h1Line1: 'anna demeshko is',
+    h1Line1: 'anna demeshko',
     h1Line2: 'product designer',
     ledeHi: '',
     lede: 'i turn complex processes into clear, convenient and beautiful products, crm systems are my passion\n\ni love my work, Ozzy Osbourne\'s music and Michel de Montaigne\'s philosophy',
     stats: {
       'projects shipped': '10+',
-      'case studies': '7',
+      'case studies': '4 (15)',
+      'work experience': '3+ years',
       experience: 'enterprise / saas / b2b / b2c',
       'open to': 'full-time',
       location: 'remote, gmt+3',
@@ -286,6 +389,8 @@ export const DATA: Record<Lang, LangData> = {
     ctaTelegram: 'message me on telegram',
     secProjectsTitle: 'projects/study_case',
     secProjectsMeta: 'research / syncs / mockups / tests => happy users',
+    secCvTitle: 'cv',
+    secCvMeta: 'recruiter-friendly version',
     secStackTitle: 'stack',
     secStackMeta: 'tools & practices',
     secContactTitle: 'contact',
@@ -302,7 +407,7 @@ export const DATA: Record<Lang, LangData> = {
     folderAbout: 'about',
     folderProjects: 'projects/study_case/',
     folderEtc: 'etc/',
-    statReady: 'ready',
+    statReady: 'open to work',
     ln: 'ln 1, col 1',
     caseStudyLabel: 'case study',
     caseBackLabel: 'back to projects',
@@ -315,6 +420,75 @@ export const DATA: Record<Lang, LangData> = {
     tooltipCopy: 'click to copy',
     tooltipCopied: 'copied!',
     tooltipNavigate: 'click to navigate',
+    cv: {
+      downloadLabel: 'download PDF',
+      photoSrc: '/portfolio/profile-binary-source.png',
+      headline: 'Product Designer',
+      summary: 'I specialize in B2B and B2C information-security products where logic, structure, and interaction clarity matter most. I design interfaces with thoughtful scenarios, clear product logic, and clean visual systems, collaborating closely with PMs, engineers, and analysts.',
+      availability: 'Open to full-time roles, remote, GMT+3.',
+      portfolioLabel: 'view portfolio',
+      portfolioHref: '#readme',
+      contactTitle: 'contacts',
+      contactRows: [
+        { label: 'phone/tg', value: '+7 963 316 2580', href: 'https://t.me/annademeshko' },
+        { label: 'email', value: 'aneyta@mail.ru', href: 'mailto:aneyta@mail.ru' },
+      ],
+      highlights: [
+        '10+ shipped product projects',
+        'B2B / B2C / SaaS / enterprise',
+        'complex tables, forms, filters, and dashboards',
+        'research, prototypes, design systems, and handoff',
+      ],
+      experienceTitle: 'experience',
+      experience: [
+        {
+          role: 'Product Designer',
+          company: 'AppSec Solutions',
+          period: 'Feb 2025 — Mar 2026 · 1 yr 2 mos',
+          details: [
+            'designed complex high-load B2B interfaces for information-security products',
+            'owned UX from user flows and wireframes to high-fidelity prototypes and developer-ready specs',
+            'contributed to the design system: components, states, specifications, Storybook, and migration to Taiga UI',
+            'collaborated with product managers, engineers, and analysts across discovery, design, and implementation',
+            'redesigned and improved product web interfaces: dashboards, forms, filters, data tables, and complex UI components',
+            'managed several product tasks in parallel while keeping deadlines, quality, and consistency under control',
+          ],
+        },
+        {
+          role: 'UX / UI Designer',
+          company: 'Grokhotov studio',
+          period: 'Mar 2024 — Jan 2025 · 11 mos',
+          details: [
+            'created wireframes, interface layouts, and interactive prototypes for engineering teams and client presentations',
+            'designed responsive interfaces, redesigned existing products, and improved user journeys',
+            'supported and updated design systems and UI kits to keep interfaces visually and behaviorally consistent',
+            'ran usability tests, collected feedback, and translated findings into interface improvements',
+          ],
+        },
+      ],
+      educationTitle: 'education',
+      education: [
+        { title: 'UX Researcher', place: 'Google UX Design', period: 'Nov 2025 — Feb 2026' },
+        { title: 'UX / UI Designer', place: 'UPROCK SCHOOL', period: 'Mar 2024 — Sep 2024' },
+        { title: 'Information Security Analyst', place: 'ITMO University', period: 'Sep 2020 — Jun 2022' },
+        { title: 'Applied Linguistics', place: 'SUAI', period: 'Sep 2014 — Jun 2018' },
+      ],
+      toolsTitle: 'tools',
+      softSkillsTitle: 'soft skills',
+      softSkills: ['creativity', 'teamwork', 'clear communication', 'self-learning', 'positive attitude', 'argumentation'],
+      hardSkillsTitle: 'hard skills',
+      hardSkills: [
+        { title: 'Product Discovery', description: '' },
+        { title: 'UX Research', description: '' },
+        { title: 'Usability Testing', description: '' },
+        { title: 'Information Architecture', description: '' },
+        { title: 'Interaction Design', description: '' },
+        { title: 'Design Systems', description: '' },
+        { title: 'Data-heavy Interfaces', description: '' },
+      ],
+      languagesTitle: 'languages',
+      languages: ['Russian — native', 'English — B2 (intermediate)'],
+    },
     stack: [
       { short: 'Fi', name: 'figma',          skills: ['auto layout', 'components & variants', 'design tokens', 'prototyping', 'dev mode', 'variables'] },
       { short: 'Ae', name: 'after effects',   skills: ['UI animations', 'motion graphics', 'Lottie export'] },
