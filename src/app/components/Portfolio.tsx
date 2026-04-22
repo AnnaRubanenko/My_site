@@ -658,11 +658,19 @@ function CaseCodeBlock({ type, label, text }: { type: keyof typeof BLOCK_COLORS;
 
 function CaseView({ project, d, onBack }: { project: Project; d: LangData; onBack: () => void }) {
   const [slideIdx, setSlideIdx] = useState(0);
+  const [activeInfoTab, setActiveInfoTab] = useState<keyof typeof BLOCK_COLORS>('task');
   const slides = (project.slides && project.slides.length)
     ? project.slides
     : [{ cover: project.cover, caption: project.caption || project.subtitle }];
   const current = slides[slideIdx];
   const total = slides.length;
+  const infoTabs = [
+    { type: 'task' as const, label: d.caseTaskLabel, text: project.task },
+    { type: 'problem' as const, label: d.caseProblemLabel, text: project.problemFull },
+    ...(project.process ? [{ type: 'process' as const, label: d.caseProcessLabel, text: project.process }] : []),
+    { type: 'solution' as const, label: d.caseSolutionLabel, text: project.solution },
+  ];
+  const activeInfo = infoTabs.find(tab => tab.type === activeInfoTab) || infoTabs[0];
 
   return (
     <section id="case" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -733,11 +741,22 @@ function CaseView({ project, d, onBack }: { project: Project; d: LangData; onBac
         </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-        <CaseCodeBlock type="task" label={d.caseTaskLabel} text={project.task} />
-        <CaseCodeBlock type="problem" label={d.caseProblemLabel} text={project.problemFull} />
-        {project.process && <CaseCodeBlock type="process" label={d.caseProcessLabel} text={project.process} />}
-        <CaseCodeBlock type="solution" label={d.caseSolutionLabel} text={project.solution} />
+      <div className="p-case-info-tabs">
+        <div className="p-case-info-tablist" role="tablist" aria-label="case details">
+          {infoTabs.map(tab => (
+            <button
+              key={tab.type}
+              type="button"
+              role="tab"
+              aria-selected={activeInfo.type === tab.type}
+              className={`p-case-info-tab p-case-info-tab-${tab.type}${activeInfo.type === tab.type ? ' p-active' : ''}`}
+              onClick={() => setActiveInfoTab(tab.type)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+        <CaseCodeBlock type={activeInfo.type} label={activeInfo.label} text={activeInfo.text} />
       </div>
     </section>
   );
@@ -913,7 +932,7 @@ export function Portfolio() {
             </svg>
           </button>
           <MacDots />
-          <span className="p-header-title" style={{ color: C.ink }}>~/portfolio/<b style={{ color: C.accent2, fontWeight: 500 }}>{currentCase ? `${currentCase}.case` : (cvOpen ? 'anna_demeshko.cv.pdf' : 'анна_демешко.fig')}</b></span>
+          <span className="p-header-title" style={{ color: C.ink }}>~/portfolio/<b style={{ color: C.accent2, fontWeight: 500 }}>{currentCase ? `${currentCase}.case` : (cvOpen ? 'anna_demeshko.cv.pdf' : (lang === 'ru' ? 'анна_демешко.fig' : 'anna_demeshko.fig'))}</b></span>
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 14, alignItems: 'center' }}>
             <span className="p-header-meta" style={{ opacity: 0.7 }}>{d.ln}</span>
             <span className="p-header-meta" style={{ opacity: 0.7 }}>utf-8</span>

@@ -157,7 +157,7 @@ export const DATA: Record<Lang, LangData> = {
     caseBackLabel: 'к главной',
     caseTaskLabel: 'задача',
     caseProblemLabel: 'проблема',
-    caseProcessLabel: 'поиск решения / ai-workflows',
+    caseProcessLabel: 'поиск решения',
     caseSolutionLabel: 'решение',
     metaYear: 'год',
     metaRole: 'роль',
@@ -277,7 +277,7 @@ export const DATA: Record<Lang, LangData> = {
         ],
         task: 'добавить функцию <em>ручного запуска сканирования</em>, чтобы команды безопасности могли инициировать проверку нужной версии прямо из интерфейса без обращения к инструментам вне платформы.',
         problemFull: 'пользователи <em>не могли запустить сканирование</em> из контекста конкретного приложения. не было понятно, в каком состоянии находится процесс: запущен ли скан, завершился ли с ошибкой, и что делать дальше. это <em>замедляло реакцию на угрозы и увеличивало время аудита</em>',
-        process: 'поиск решения начинался с карты состояний запуска: черновик формы, проверка обязательных параметров, сценарии повторного клика, ошибка, успешный запуск и возврат в таблицу. несколько итераций ушло на то, чтобы сделать процесс понятным без отдельной страницы статуса.\n\n<em>AI-workflows</em> помогали быстро разложить edge cases, сформулировать микротексты для состояний формы и сравнить варианты поведения кнопки после отправки. дальше решения сверялись с техническими ограничениями запуска скана и логикой безопасности.',
+        process: 'поиск решения начинался с карты состояний запуска: черновик формы, проверка обязательных параметров, сценарии повторного клика, ошибка, успешный запуск и возврат в таблицу. несколько итераций ушло на то, чтобы сделать процесс понятным без отдельной страницы статуса.\n\n<em>AI</em> помогал быстро разложить edge cases, сформулировать микротексты для состояний формы и сравнить варианты поведения кнопки после отправки. дальше решения сверялись с техническими ограничениями запуска скана и логикой безопасности.',
         solution: '<em>спроектировали сценарий инициации сканирования</em> через контекстное меню приложения → модальная форма с параметрами запуска (окружение, ветка, коммит, тег, версия) с валидацией на уровне активации CTA.\n\nформа реализует последовательную смену состояний:\n<em>inactive</em> — кнопка недоступна до заполнения обязательных полей\n<em>loading</em> — форма блокируется оверлеем со спиннером, исключая повторный запрос\n<em>completed</em> — модалка закрывается, управление возвращается к списку версий',
       },
       {
@@ -299,7 +299,7 @@ export const DATA: Record<Lang, LangData> = {
         ],
         task: 'добавить функцию сравнения результатов сканирований, чтобы команды безопасности могли <em>отслеживать динамику уязвимостей</em> между версиями приложений и коммитами.',
         problemFull: 'пользователи не могли <em>сопоставить результаты</em> двух сканирований без ручного анализа. было непонятно, какие уязвимости появились после нового деплоя, какие устранены, а какие изменили уровень критичности. это <em>замедляло реакцию на угрозы</em> и усложняло аудит безопасности между релизами.',
-        process: 'поиск решения шёл через несколько итераций: сначала проверяли простой список изменений, затем split-view по двум сканам, после — таблицу компонентов с дельтами и боковой панелью деталей.\n\n<em>AI-workflows</em> использовались как ускоритель исследования и проектирования: я собирала и структурировала сценарии аудиторов, формулировала гипотезы для diff-логики, сравнивала варианты группировки данных и проверяла UX-тексты для статусов «новое / исправлено / изменилось». финальные решения проходили через продуктовую логику, ограничения данных и обсуждение с командой.',
+        process: 'поиск решения шёл через несколько итераций: сначала проверяли простой список изменений, затем split-view по двум сканам, после — таблицу компонентов с дельтами и боковой панелью деталей.\n\n<em>AI</em> использовался как ускоритель исследования и проектирования: я собирала и структурировала сценарии аудиторов, формулировала гипотезы для diff-логики, сравнивала варианты группировки данных и проверяла UX-тексты для статусов «новое / исправлено / изменилось». финальные решения проходили через продуктовую логику, ограничения данных и обсуждение с командой.',
         solution: `спроектировали функцию сравнения: пользователь выбирает два скана из списка и нажимает «сравнение» — открывается side-by-side вид с метаданными каждого скана (окружение, способ запуска, коммит). таблица компонентов <em>подсвечивает изменения цветом</em>: зелёным — новые уязвимости, красным — устранённые. дельта-счётчики (+/−) <em>показывают динамику</em> по уровням cvss.`,
       },
       {
@@ -323,7 +323,7 @@ export const DATA: Record<Lang, LangData> = {
         ],
         task: 'спроектировать <em>кастомизируемый дашборд</em> чтобы команды могли <em>формировать персональный обзор ключевых метрик</em> — уязвимостей, политик, компонентов и репозиториев — без необходимости переходить между разделами',
         problemFull: 'у пользователей не было единой точки входа для мониторинга состояния безопасности. каждая команда фокусируется на разных метриках, а единый статичный экран не покрывал потребности всех ролей. это приводило к <em>избыточной навигации и потере времени</em> при ежедневном контроле',
-        process: 'поиск решения шёл от статичного overview к модульной модели: сначала собирали список метрик по ролям, затем проверяли варианты виджетов, порядок добавления, превью до применения и сценарий разворачивания важных блоков.\n\n<em>AI-workflows</em> использовались для кластеризации потребностей разных ролей, генерации гипотез по составу виджетов и быстрой проверки информационной архитектуры. финальная композиция собиралась вокруг реальных ежедневных задач: мониторинг, сравнение, приоритизация и быстрый переход к деталям.',
+        process: 'поиск решения шёл от статичного overview к модульной модели: сначала собирали список метрик по ролям, затем проверяли варианты виджетов, порядок добавления, превью до применения и сценарий разворачивания важных блоков.\n\n<em>AI</em> использовался для кластеризации потребностей разных ролей, генерации гипотез по составу виджетов и быстрой проверки информационной архитектуры. финальная композиция собиралась вокруг реальных ежедневных задач: мониторинг, сравнение, приоритизация и быстрый переход к деталям.',
         solution: 'спроектирован модульный дашборд с возможностью <em>самостоятельной конфигурации под задачи</em> конкретной команды. пользователь формирует состав экрана через модальное окно с превью виджетов. <em>время на получение ключевых метрик сократилось</em> с 4 переходов между разделами до одного экрана — дашборд закрыл 80% ежедневных сценариев мониторинга.',
       },
       {
@@ -345,7 +345,7 @@ export const DATA: Record<Lang, LangData> = {
         ],
         task: 'спроектировать сценарий триажа, в котором аналитик может <em>быстро изменить статус, уровень, влияние и комментарий</em> прямо из карточки уязвимости — без лишних переходов и потери контекста сканирования.',
         problemFull: 'до переработки триаж требовал лишних действий и не давал ощущения управляемого процесса. аналитикам приходилось тратить время на переключение внимания между списком, деталями уязвимости и редактированием. из-за этого <em>обновление статусов и параметров занимало слишком много времени</em>, а подтверждение сохранения было недостаточно очевидным.',
-        process: 'поиск решения строился вокруг скорости и контроля: сравнивали inline-редактирование, отдельную страницу и компактную модалку. итерации помогли оставить пользователя в контексте карточки, но дать достаточно места для статуса, уровня, влияния и подтверждения.\n\n<em>AI-workflows</em> применялись для разборки сценариев аналитика, проверки последовательности полей, формулировки ошибок и подтверждений, а также для быстрого сравнения вариантов UX-copy. после этого сценарий уточнялся через ограничения данных и привычные паттерны работы аналитиков.',
+        process: 'поиск решения строился вокруг скорости и контроля: сравнивали inline-редактирование, отдельную страницу и компактную модалку. итерации помогли оставить пользователя в контексте карточки, но дать достаточно места для статуса, уровня, влияния и подтверждения.\n\n<em>AI</em> применялся для разборки сценариев аналитика, проверки последовательности полей, формулировки ошибок и подтверждений, а также для быстрого сравнения вариантов UX-copy. после этого сценарий уточнялся через ограничения данных и привычные паттерны работы аналитиков.',
         solution: 'я собрала триаж в компактный модальный сценарий внутри карточки уязвимости: ключевые поля редактируются в одном окне, кнопка действия становится активной только при валидном состоянии формы, а после сохранения пользователь сразу видит <em>обновлённый статус и явное подтверждение успеха</em>. это <em>сократило время на обработку</em> и сделало работу с уязвимостями заметно быстрее в ежедневных сценариях.',
       },
       {
@@ -420,7 +420,7 @@ export const DATA: Record<Lang, LangData> = {
     caseBackLabel: 'back to projects',
     caseTaskLabel: 'task',
     caseProblemLabel: 'problem',
-    caseProcessLabel: 'solution search / ai-workflows',
+    caseProcessLabel: 'solution search',
     caseSolutionLabel: 'solution',
     metaYear: 'year',
     metaRole: 'role',
@@ -540,7 +540,7 @@ export const DATA: Record<Lang, LangData> = {
         ],
         task: 'add a <em>manual scan launch</em> feature so security teams can initiate a check of any version directly from the interface — without reaching for tools outside the platform.',
         problemFull: "users <em>couldn't launch a scan</em> from the context of a specific application. there was no way to tell the process state: whether the scan had started, finished with an error, or what to do next. this <em>slowed threat response and increased audit time</em>",
-        process: 'solution search started with a state map for scan launch: draft form, required params, repeated click, error, successful launch, and return to the table. several iterations focused on making the process understandable without creating a separate status page.\n\n<em>AI-workflows</em> helped unpack edge cases, draft microcopy for form states, and compare button behavior after submit. final decisions were checked against technical launch constraints and security logic.',
+        process: 'solution search started with a state map for scan launch: draft form, required params, repeated click, error, successful launch, and return to the table. several iterations focused on making the process understandable without creating a separate status page.\n\n<em>AI</em> helped unpack edge cases, draft microcopy for form states, and compare button behavior after submit. final decisions were checked against technical launch constraints and security logic.',
         solution: '<em>designed the scan initiation flow</em> via the app context menu → a modal form with launch params (environment, branch, commit, tag, version), validated at the CTA activation level.\n\nthe form implements sequential state transitions:\n<em>inactive</em> — button locked until required fields are filled\n<em>loading</em> — form is blocked by a spinner overlay, preventing duplicate requests\n<em>completed</em> — modal closes, control returns to the versions list',
       },
       {
@@ -561,7 +561,7 @@ export const DATA: Record<Lang, LangData> = {
         ],
         task: 'add a scan comparison feature so security teams can <em>track vulnerability dynamics</em> between app versions and commits.',
         problemFull: "users couldn't <em>reconcile the results</em> of two scans without manual analysis. it was unclear which vulnerabilities appeared after a new deploy, which were fixed, and which changed severity. this <em>slowed threat response</em> and complicated security audits between releases.",
-        process: 'solution search went through several iterations: first a simple change log, then a split-view for two scans, then a component table with deltas and a details side panel.\n\n<em>AI-workflows</em> helped speed up research and interface thinking: i used them to structure auditor scenarios, shape hypotheses for diff logic, compare data-grouping options, and stress-test UX copy for "new / fixed / changed" states. final decisions were still grounded in product logic, data constraints, and team review.',
+        process: 'solution search went through several iterations: first a simple change log, then a split-view for two scans, then a component table with deltas and a details side panel.\n\n<em>AI</em> helped speed up research and interface thinking: i used it to structure auditor scenarios, shape hypotheses for diff logic, compare data-grouping options, and stress-test UX copy for "new / fixed / changed" states. final decisions were still grounded in product logic, data constraints, and team review.',
         solution: 'designed a comparison feature: user picks two scans from the list and clicks "compare" — a side-by-side view opens with metadata for each scan (environment, launch method, commit). the components table <em>highlights changes by color</em>: green for new vulnerabilities, red for fixed ones. delta counters (+/−) <em>show dynamics</em> across cvss levels.',
       },
       {
@@ -583,7 +583,7 @@ export const DATA: Record<Lang, LangData> = {
         ],
         task: 'design a <em>customizable dashboard</em> so teams can <em>build a personal view of key metrics</em> — vulnerabilities, policies, components, and repositories — without navigating between sections',
         problemFull: "users had no single entry point for monitoring their security posture. each team focuses on different metrics, and a single static screen couldn't cover all roles' needs. this led to <em>excessive navigation and wasted time</em> during daily monitoring",
-        process: 'solution search moved from a static overview toward a modular model: first we mapped metrics by role, then tested widget options, add flow, preview-before-apply behavior, and expanded states for important blocks.\n\n<em>AI-workflows</em> helped cluster role needs, generate hypotheses for widget composition, and quickly check information architecture. the final layout was grounded in daily jobs: monitoring, comparison, prioritization, and fast access to details.',
+        process: 'solution search moved from a static overview toward a modular model: first we mapped metrics by role, then tested widget options, add flow, preview-before-apply behavior, and expanded states for important blocks.\n\n<em>AI</em> helped cluster role needs, generate hypotheses for widget composition, and quickly check information architecture. the final layout was grounded in daily jobs: monitoring, comparison, prioritization, and fast access to details.',
         solution: 'designed a modular dashboard with <em>self-configuration per team needs</em>. users compose their screen through a modal with widget previews. <em>time to access key metrics dropped</em> from 4 section navigations to a single screen — the dashboard covers 80% of daily monitoring scenarios.',
       },
       {
@@ -605,7 +605,7 @@ export const DATA: Record<Lang, LangData> = {
         ],
         task: 'design a triage flow where an analyst can <em>quickly update status, severity, impact, and comment</em> right inside the vulnerability card — without extra navigation or losing scan context.',
         problemFull: "before the redesign, triage took too many steps and didn't feel controlled. analysts had to split attention between the list, the vulnerability details, and the editing flow. as a result, <em>updating statuses and parameters took too long</em>, and the save confirmation wasn't clear enough.",
-        process: 'solution search focused on speed and control: we compared inline editing, a separate page, and a compact modal. iterations helped keep the user inside the vulnerability card context while still giving enough space for status, severity, impact, and confirmation.\n\n<em>AI-workflows</em> were used to break down analyst scenarios, validate field sequence, draft errors and confirmations, and compare UX-copy options quickly. the flow was then refined against data constraints and familiar analyst work patterns.',
+        process: 'solution search focused on speed and control: we compared inline editing, a separate page, and a compact modal. iterations helped keep the user inside the vulnerability card context while still giving enough space for status, severity, impact, and confirmation.\n\n<em>AI</em> was used to break down analyst scenarios, validate field sequence, draft errors and confirmations, and compare UX-copy options quickly. the flow was then refined against data constraints and familiar analyst work patterns.',
         solution: 'i turned triage into a compact modal flow inside the vulnerability card: key fields are editable in one place, the primary action becomes available only when the form is in a valid state, and after saving the user immediately sees the <em>updated status and a clear success confirmation</em>. this reduced time-to-triage and made daily vulnerability handling noticeably faster.',
       },
       {
