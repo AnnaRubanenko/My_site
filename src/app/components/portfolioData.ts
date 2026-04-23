@@ -11,7 +11,7 @@ export interface Project {
   problem: string;
   role: string;
   cover: string;
-  slides?: { cover?: string; image?: string; alt?: string; caption: string }[];
+  slides?: { cover?: string; image?: string; alt?: string; caption?: string; imageMode?: 'default' | 'fit' | 'full' }[];
   caption?: string;
   task: string;
   problemFull: string;
@@ -98,7 +98,7 @@ export interface LangData {
   };
   stack: { short: string; name: string; skills: string[] }[];
   contacts: { label: string; value: string; href: string }[];
-  tracks: string[];
+  tracks: { title: string; artworkSrc: string; artworkAlt: string }[];
   projects: Project[];
 }
 
@@ -112,8 +112,8 @@ export const DATA: Record<Lang, LangData> = {
     ledeHi: '',
     lede: 'превращаю сложные процессы в понятные, удобные и красивые продукты, crm системы — моя страсть\n\nлюблю свою работу, музыку Оззи Осборна и философию Мишеля Монтеня',
     stats: {
-      'запущено проектов': '10+',
-      'кейсов': '4 (15)',
+      'запущено проектов': '7',
+      'кейсов': '5 (15)',
       'опыт работы': '3+ года',
       'домены': 'enterprise / saas / b2b / b2c',
       'формат работы': 'full-time',
@@ -250,11 +250,31 @@ export const DATA: Record<Lang, LangData> = {
       { label: 'linkedin', value: 'in/anna-demeshko', href: 'https://www.linkedin.com/in/anna-demeshko-534755238/' },
     ],
     tracks: [
-      'crazy train — ozzy osbourne',
-      'iron man — black sabbath',
-      'rock you like a hurricane — scorpions',
-      'essais, livre i — m. montaigne',
-      'paranoid — black sabbath',
+      {
+        title: 'crazy train — ozzy osbourne',
+        artworkSrc: 'https://upload.wikimedia.org/wikipedia/en/thumb/2/23/Blizzard_of_ozz.jpg/250px-Blizzard_of_ozz.jpg',
+        artworkAlt: 'Обложка альбома Blizzard of Ozz — Ozzy Osbourne',
+      },
+      {
+        title: 'no more tears — ozzy osbourne',
+        artworkSrc: 'https://upload.wikimedia.org/wikipedia/en/thumb/3/35/Ozzy_Osbourne_-_No_More_Tears.JPG/250px-Ozzy_Osbourne_-_No_More_Tears.JPG',
+        artworkAlt: 'Обложка альбома No More Tears — Ozzy Osbourne',
+      },
+      {
+        title: 'iron man — black sabbath',
+        artworkSrc: 'https://upload.wikimedia.org/wikipedia/en/thumb/6/64/Black_Sabbath_-_Paranoid.jpg/250px-Black_Sabbath_-_Paranoid.jpg',
+        artworkAlt: 'Обложка альбома Paranoid — Black Sabbath',
+      },
+      {
+        title: 'paranoid — black sabbath',
+        artworkSrc: 'https://upload.wikimedia.org/wikipedia/en/thumb/6/64/Black_Sabbath_-_Paranoid.jpg/250px-Black_Sabbath_-_Paranoid.jpg',
+        artworkAlt: 'Обложка альбома Paranoid — Black Sabbath',
+      },
+      {
+        title: 'rock you like a hurricane — scorpions',
+        artworkSrc: 'https://upload.wikimedia.org/wikipedia/en/thumb/6/68/The_Scorpions_LatFS.jpg/250px-The_Scorpions_LatFS.jpg',
+        artworkAlt: 'Обложка альбома Love at First Sting — Scorpions',
+      },
     ],
     projects: [
       {
@@ -349,6 +369,25 @@ export const DATA: Record<Lang, LangData> = {
         solution: 'я собрала триаж в компактный модальный сценарий внутри карточки уязвимости: ключевые поля редактируются в одном окне, кнопка действия становится активной только при валидном состоянии формы, а после сохранения пользователь сразу видит <em>обновлённый статус и явное подтверждение успеха</em>. это <em>сократило время на обработку</em> и сделало работу с уязвимостями заметно быстрее в ежедневных сценариях.',
       },
       {
+        id: 'design_system',
+        title: 'развитие дизайн-системы',
+        subtitle: 'marlin design system · components & documentation',
+        year: '2025',
+        tags: ['design system', 'b2b', 'documentation'],
+        metric: { value: '6', label: 'компонентов добавлено в систему' },
+        problem: 'в продукте не хватало единых компонентов и прозрачных правил их использования',
+        role: 'product designer',
+        cover: 'table',
+        slides: [
+          { image: '/portfolio/Buttons.png', cover: 'table', imageMode: 'full' },
+          { image: '/portfolio/other.png', cover: 'table', imageMode: 'full' },
+        ],
+        task: 'развить <em>marlin design system</em>: добавить в неё недостающие базовые компоненты и собрать для них понятную документацию, чтобы команда быстрее проектировала новые сценарии и опиралась на единые правила.',
+        problemFull: 'часть важных UI-паттернов уже использовалась в продукте, но ещё не была оформлена как полноценный системный слой. из-за этого кнопки, split button, breadcrumbs, modal window, input number stepper и segmented control могли трактоваться по-разному в разных макетах. команде не хватало <em>единого описания структуры, состояний и правил применения</em>, а handoff снова зависел от ручных комментариев.',
+        process: 'я подошла к задаче как к развитию продукта внутри продукта: сначала выделила повторяющиеся паттерны, которые уже были востребованы в интерфейсах, но не были собраны в систему. затем для каждого компонента описала состав, состояния, размеры, ограничения и сценарии использования.\n\nв рамках этой итерации я добавила в систему <em>button</em>, <em>split button</em>, <em>breadcrumbs</em>, <em>modal window</em>, <em>input number stepper</em> и <em>segmented control</em>, а затем оформила для них визуальную документацию с примерами и правилами использования.',
+        solution: 'в результате <em>Marlin Design System</em> получила шесть новых системных компонентов и цельный documentation layer. у каждого паттерна теперь есть зафиксированные состояния, состав, логика применения и примеры использования. это сделало интерфейсы консистентнее, упростило масштабирование решений и дало команде единый reference для дизайна и передачи в разработку.',
+      },
+      {
         id: 'case-loading-1',
         isLoading: true,
         title: 'исследования, синки, макеты и тесты уже упаковываются в кейсы',
@@ -375,8 +414,8 @@ export const DATA: Record<Lang, LangData> = {
     ledeHi: '',
     lede: 'i turn complex processes into clear, convenient and beautiful products, crm systems are my passion\n\ni love my work, Ozzy Osbourne\'s music and Michel de Montaigne\'s philosophy',
     stats: {
-      'projects shipped': '10+',
-      'case studies': '4 (15)',
+      'projects shipped': '7',
+      'case studies': '5 (15)',
       'work experience': '3+ years',
       experience: 'enterprise / saas / b2b / b2c',
       'open to': 'full-time',
@@ -513,11 +552,31 @@ export const DATA: Record<Lang, LangData> = {
       { label: 'linkedin', value: 'in/anna-demeshko', href: 'https://www.linkedin.com/in/anna-demeshko-534755238/' },
     ],
     tracks: [
-      'crazy train — ozzy osbourne',
-      'iron man — black sabbath',
-      'rock you like a hurricane — scorpions',
-      'essais, livre i — m. montaigne',
-      'paranoid — black sabbath',
+      {
+        title: 'crazy train — ozzy osbourne',
+        artworkSrc: 'https://upload.wikimedia.org/wikipedia/en/thumb/2/23/Blizzard_of_ozz.jpg/250px-Blizzard_of_ozz.jpg',
+        artworkAlt: 'Blizzard of Ozz album cover by Ozzy Osbourne',
+      },
+      {
+        title: 'no more tears — ozzy osbourne',
+        artworkSrc: 'https://upload.wikimedia.org/wikipedia/en/thumb/3/35/Ozzy_Osbourne_-_No_More_Tears.JPG/250px-Ozzy_Osbourne_-_No_More_Tears.JPG',
+        artworkAlt: 'No More Tears album cover by Ozzy Osbourne',
+      },
+      {
+        title: 'iron man — black sabbath',
+        artworkSrc: 'https://upload.wikimedia.org/wikipedia/en/thumb/6/64/Black_Sabbath_-_Paranoid.jpg/250px-Black_Sabbath_-_Paranoid.jpg',
+        artworkAlt: 'Paranoid album cover by Black Sabbath',
+      },
+      {
+        title: 'paranoid — black sabbath',
+        artworkSrc: 'https://upload.wikimedia.org/wikipedia/en/thumb/6/64/Black_Sabbath_-_Paranoid.jpg/250px-Black_Sabbath_-_Paranoid.jpg',
+        artworkAlt: 'Paranoid album cover by Black Sabbath',
+      },
+      {
+        title: 'rock you like a hurricane — scorpions',
+        artworkSrc: 'https://upload.wikimedia.org/wikipedia/en/thumb/6/68/The_Scorpions_LatFS.jpg/250px-The_Scorpions_LatFS.jpg',
+        artworkAlt: 'Love at First Sting album cover by Scorpions',
+      },
     ],
     projects: [
       {
@@ -607,6 +666,25 @@ export const DATA: Record<Lang, LangData> = {
         problemFull: "before the redesign, triage took too many steps and didn't feel controlled. analysts had to split attention between the list, the vulnerability details, and the editing flow. as a result, <em>updating statuses and parameters took too long</em>, and the save confirmation wasn't clear enough.",
         process: 'solution search focused on speed and control: we compared inline editing, a separate page, and a compact modal. iterations helped keep the user inside the vulnerability card context while still giving enough space for status, severity, impact, and confirmation.\n\n<em>AI</em> was used to break down analyst scenarios, validate field sequence, draft errors and confirmations, and compare UX-copy options quickly. the flow was then refined against data constraints and familiar analyst work patterns.',
         solution: 'i turned triage into a compact modal flow inside the vulnerability card: key fields are editable in one place, the primary action becomes available only when the form is in a valid state, and after saving the user immediately sees the <em>updated status and a clear success confirmation</em>. this reduced time-to-triage and made daily vulnerability handling noticeably faster.',
+      },
+      {
+        id: 'design_system',
+        title: 'design system evolution',
+        subtitle: 'marlin design system · components & documentation',
+        year: '2025',
+        tags: ['design system', 'b2b', 'documentation'],
+        metric: { value: '6', label: 'components added to the system' },
+        problem: 'the product lacked shared components and clear rules for how to use them',
+        role: 'product designer',
+        cover: 'table',
+        slides: [
+          { image: '/portfolio/Buttons.png', cover: 'table', imageMode: 'full' },
+          { image: '/portfolio/other.png', cover: 'table', imageMode: 'full' },
+        ],
+        task: 'evolve <em>Marlin Design System</em> by adding missing foundational components and documenting them, so the team could build new flows faster and rely on one shared system language.',
+        problemFull: 'several important UI patterns were already used across the product, but they still had no proper system definition. button, split button, breadcrumbs, modal window, input number stepper, and segmented control all needed <em>formalized structure, states, and usage rules</em>; otherwise decisions kept drifting between screens and handoff depended on manual explanation.',
+        process: 'i approached this work as product development inside the system itself: first, i mapped the recurring patterns that were clearly needed in the interface but had not yet been packaged as design-system components. then i defined their composition, states, sizes, behavior, and usage boundaries.\n\nin this iteration i added <em>button</em>, <em>split button</em>, <em>breadcrumbs</em>, <em>modal window</em>, <em>input number stepper</em>, and <em>segmented control</em> to the system and created visual documentation for each of them.',
+        solution: 'the result was <em>an expanded Marlin Design System</em> with six new documented components and a stronger documentation layer. each pattern now has defined states, composition, usage logic, and examples. this made interface decisions more consistent, reduced ambiguity in design-to-dev handoff, and gave the team a clearer foundation for scaling the product.',
       },
       {
         id: 'case-loading-1',

@@ -5,17 +5,38 @@ import { STACK_ICONS } from './StackIcons';
 // ── Color constants ──────────────────────────────────────────────────────────
 
 const C = {
-  bg: '#151517',
-  panel: '#1c1c20',
-  panel2: '#232328',
-  ink: '#d7d7dc',
-  muted: '#7a7a82',
-  dim: '#3a3a42',
-  line: 'rgba(255,255,255,0.07)',
-  accent: '#4b3bff',
-  accent2: '#d4fb3c',
+  bg: 'var(--p-bg)',
+  panel: 'var(--p-panel)',
+  panel2: 'var(--p-panel2)',
+  ink: 'var(--p-ink)',
+  muted: 'var(--p-muted)',
+  dim: 'var(--p-dim)',
+  line: 'var(--p-line)',
+  accent: 'var(--p-accent)',
+  accent2: 'var(--p-accent2)',
   mono: "'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, monospace",
   sans: "'Geist', -apple-system, system-ui, sans-serif",
+  keyword: 'var(--p-code-keyword)',
+  function: 'var(--p-code-function)',
+  tooltipBg: 'var(--p-tooltip-bg)',
+  tooltipInk: 'var(--p-tooltip-ink)',
+  successInk: 'var(--p-success-ink)',
+  successBg: 'var(--p-success-bg)',
+  tagBg: 'var(--p-tag-bg)',
+  tagBgStrong: 'var(--p-tag-bg-strong)',
+  casePlaceholderBg: 'var(--p-case-placeholder-bg)',
+  vibesBg: 'var(--p-vibes-bg)',
+  vibesBorder: 'var(--p-vibes-border)',
+  vibesShadow: 'var(--p-vibes-shadow)',
+  vibesLabel: 'var(--p-vibes-label)',
+  spotifyBg: 'var(--p-spotify-bg)',
+  spotifyInk: 'var(--p-spotify-ink)',
+  tabStrip: 'var(--p-tab-strip)',
+  mobileNavBg: 'var(--p-mobile-nav-bg)',
+  mobileNavShadow: 'var(--p-mobile-nav-shadow)',
+  mobileActiveBg: 'var(--p-mobile-active-bg)',
+  mobilePressBg: 'var(--p-mobile-press-bg)',
+  tgInk: 'var(--p-tg-ink)',
 } as const;
 
 // ── Tiny shared components ────────────────────────────────────────────────────
@@ -33,9 +54,9 @@ function MacDots() {
 function Ln({ n }: { n: number }) {
   return <span style={{ color: C.dim, userSelect: 'none', display: 'inline-block', width: 22, textAlign: 'right', marginRight: 14 }}>{n}</span>;
 }
-function Kw({ c }: { c: React.ReactNode }) { return <span style={{ color: '#c77dff' }}>{c}</span>; }
+function Kw({ c }: { c: React.ReactNode }) { return <span style={{ color: C.keyword }}>{c}</span>; }
 function Str({ c }: { c: React.ReactNode }) { return <span style={{ color: C.accent2 }}>{c}</span>; }
-function Fn({ c }: { c: React.ReactNode }) { return <span style={{ color: '#ff8a4c' }}>{c}</span>; }
+function Fn({ c }: { c: React.ReactNode }) { return <span style={{ color: C.function }}>{c}</span>; }
 function Com({ c }: { c: React.ReactNode }) { return <span style={{ color: C.muted }}>{c}</span>; }
 
 function CodeBlock({ children, style }: { children: React.ReactNode; style?: React.CSSProperties }) {
@@ -192,7 +213,7 @@ function ProjectRow({ p, idx, onOpenCase }: { p: Project; idx: number; onOpenCas
               border: `1px solid ${hovered ? C.accent2 : C.line}`,
               borderRadius: 2,
               color: hovered ? C.accent2 : C.muted,
-              background: hovered ? 'rgba(212,251,60,0.08)' : 'transparent',
+              background: hovered ? C.tagBgStrong : 'transparent',
               textTransform: 'lowercase' as const,
               fontFamily: C.mono,
               transition: 'color 0.15s ease, border-color 0.15s ease, background 0.15s ease',
@@ -434,8 +455,8 @@ function EmailContactRow({ c, d }: { c: { label: string; value: string; href: st
           right: 36,
           top: '50%',
           transform: 'translateY(-50%)',
-          background: C.ink,
-          color: C.bg,
+          background: C.tooltipBg,
+          color: C.tooltipInk,
           fontSize: 10,
           padding: '3px 8px',
           borderRadius: 3,
@@ -454,8 +475,8 @@ function EmailContactRow({ c, d }: { c: { label: string; value: string; href: st
           right: 36,
           top: '50%',
           transform: 'translateY(-50%)',
-          background: C.accent2,
-          color: '#000',
+          background: C.successBg,
+          color: C.successInk,
           fontSize: 10,
           padding: '3px 8px',
           borderRadius: 3,
@@ -494,8 +515,8 @@ function LinkContactRow({ c, d }: { c: { label: string; value: string; href: str
           right: 36,
           top: '50%',
           transform: 'translateY(-50%)',
-          background: C.ink,
-          color: C.bg,
+          background: C.tooltipBg,
+          color: C.tooltipInk,
           fontSize: 10,
           padding: '3px 8px',
           borderRadius: 3,
@@ -538,6 +559,16 @@ function ContactSection({ d }: { d: LangData }) {
 // ── Vibes section ─────────────────────────────────────────────────────────────
 
 function VibesSection({ d }: { d: LangData }) {
+  const [currentTrack, setCurrentTrack] = useState(() => d.tracks[Math.floor(Math.random() * d.tracks.length)] || null);
+
+  useEffect(() => {
+    setCurrentTrack(d.tracks[Math.floor(Math.random() * d.tracks.length)] || null);
+  }, [d]);
+
+  const trackTitle = currentTrack?.title || d.vibesPlaylistTitle;
+  const trackArtwork = currentTrack?.artworkSrc || d.vibesArtworkSrc;
+  const trackArtworkAlt = currentTrack?.artworkAlt || d.vibesArtworkAlt;
+
   return (
     <section id="vibes" style={{ scrollMarginTop: 60 }}>
       <SectionHead title={d.secVibesTitle} ext=".mp3" meta={d.secVibesMeta} />
@@ -552,32 +583,32 @@ function VibesSection({ d }: { d: LangData }) {
           justifyContent: 'space-between',
           gap: 16,
           textDecoration: 'none',
-          background: 'linear-gradient(135deg, rgba(29,185,84,0.18), rgba(28,28,32,0.96) 45%, rgba(21,21,23,1))',
-          border: `1px solid rgba(29,185,84,0.28)`,
+          background: C.vibesBg,
+          border: `1px solid ${C.vibesBorder}`,
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
           <img
-            src={d.vibesArtworkSrc}
-            alt={d.vibesArtworkAlt}
+            src={trackArtwork}
+            alt={trackArtworkAlt}
             style={{
               width: 54,
               height: 54,
               borderRadius: 8,
               objectFit: 'cover',
-              boxShadow: '0 10px 28px rgba(0,0,0,0.28)',
+              boxShadow: C.vibesShadow,
               flexShrink: 0,
             }}
           />
           <div style={{ minWidth: 0 }}>
-            <div className="p-vibes-label" style={{ fontFamily: C.mono, fontSize: 11, color: 'rgba(232,232,234,0.72)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
+            <div className="p-vibes-label" style={{ fontFamily: C.mono, fontSize: 11, color: C.vibesLabel, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
               {d.vibesLabel}
             </div>
             <div className="p-vibes-eq" aria-label={d.vibesLabel}>
               {[1, 2, 3, 4].map(bar => <span key={bar} className="p-eq-bar" />)}
             </div>
             <div style={{ color: C.ink, fontSize: 16, lineHeight: 1.25, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {d.vibesPlaylistTitle}
+              {trackTitle}
             </div>
             <div style={{ color: C.muted, fontSize: 12 }}>
               {d.vibesPlaylistMeta}
@@ -587,8 +618,8 @@ function VibesSection({ d }: { d: LangData }) {
         <span
           className="p-vibes-cta"
           style={{
-            color: '#0c0c0d',
-            background: '#1db954',
+            color: C.spotifyInk,
+            background: C.spotifyBg,
             padding: '8px 12px',
             borderRadius: 999,
             fontSize: 11,
@@ -640,7 +671,7 @@ function CaseCodeBlock({ type, label, text }: { type: keyof typeof BLOCK_COLORS;
       </div>
       <div>
         <span style={{ color: C.dim, display: 'inline-block', width: 22, textAlign: 'right', marginRight: 14 }}>2</span>
-        <Kw c="const" /> <span style={{ color: '#ff8a4c' }}>{type}</span> = () =&gt; (
+        <Kw c="const" /> <span style={{ color: C.function }}>{type}</span> = () =&gt; (
       </div>
       <div style={{ display: 'flex', alignItems: 'flex-start', padding: '6px 0' }}>
         <span style={{ color: C.dim, display: 'inline-block', width: 22, textAlign: 'right', marginRight: 14, flexShrink: 0 }}>3</span>
@@ -684,7 +715,7 @@ function CaseView({ project, d, onBack }: { project: Project; d: LangData; onBac
       <div className="p-case-meta-row">
         <div className="p-case-tags">
           {project.tags.map(t => (
-            <span key={t} style={{ fontFamily: C.mono, fontSize: 13, padding: '5px 14px', border: `1px solid ${C.line}`, borderRadius: 999, color: C.accent2, background: 'rgba(212,251,60,0.04)', textTransform: 'lowercase' }}>{t}</span>
+            <span key={t} style={{ fontFamily: C.mono, fontSize: 13, padding: '5px 14px', border: `1px solid ${C.line}`, borderRadius: 999, color: C.accent2, background: C.tagBg, textTransform: 'lowercase' }}>{t}</span>
           ))}
         </div>
         <div className="p-case-metric">
@@ -702,15 +733,22 @@ function CaseView({ project, d, onBack }: { project: Project; d: LangData; onBac
           </span>
         </div>
 
-        <div className={`p-case-screen-body${current.image ? ' p-has-image' : ''}`}>
+        <div className={`p-case-screen-body${current.image ? ' p-has-image' : ''}${current.imageMode === 'fit' ? ' p-case-screen-fit' : ''}`}>
           {current.image ? (
             <img
               src={current.image}
               alt={current.alt || project.subtitle}
-              style={{ width: 'auto', maxWidth: '100%', height: 'auto', display: 'block', borderRadius: 0, margin: '0 auto' }}
+              style={{
+                width: current.imageMode === 'fit' || current.imageMode === 'full' ? '100%' : 'auto',
+                maxWidth: '100%',
+                height: 'auto',
+                display: 'block',
+                borderRadius: 0,
+                margin: '0 auto',
+              }}
             />
           ) : (
-            <span style={{ position: 'relative', zIndex: 3, fontFamily: C.mono, fontSize: 11, color: C.muted, padding: '8px 14px', border: `1px dashed ${C.line}`, borderRadius: 3, background: 'rgba(21,21,23,0.7)', backdropFilter: 'blur(4px)', textAlign: 'center', maxWidth: '80%', lineHeight: 1.5 }}>
+            <span style={{ position: 'relative', zIndex: 3, fontFamily: C.mono, fontSize: 11, color: C.muted, padding: '8px 14px', border: `1px dashed ${C.line}`, borderRadius: 3, background: C.casePlaceholderBg, backdropFilter: 'blur(4px)', textAlign: 'center', maxWidth: '80%', lineHeight: 1.5 }}>
               {d.screenPlaceholder}<br />{project.subtitle}
             </span>
           )}
@@ -736,9 +774,11 @@ function CaseView({ project, d, onBack }: { project: Project; d: LangData; onBac
           </div>
         )}
 
-        <div style={{ fontFamily: C.mono, fontSize: 12, color: C.muted, lineHeight: 1.65, padding: '12px 16px 14px', background: C.panel2, borderTop: `1px solid ${C.line}` }}>
-          // {current.caption}
-        </div>
+        {current.caption ? (
+          <div style={{ fontFamily: C.mono, fontSize: 12, color: C.muted, lineHeight: 1.65, padding: '12px 16px 14px', background: C.panel2, borderTop: `1px solid ${C.line}` }}>
+            // {current.caption}
+          </div>
+        ) : null}
       </div>
 
       <div className="p-case-info-tabs">
@@ -949,7 +989,7 @@ export function Portfolio() {
         <aside className={`p-sidebar${sidebarOpen ? ' p-sidebar-open' : ''}`} style={{ gridArea: 'side', background: C.panel, borderRight: `1px solid ${C.line}`, overflowY: 'auto', padding: '8px 0 20px' }}>
           {[
             { label: d.folderAbout, items: [{ id: 'readme', icon: '☰', name: 'readme', ext: '.md' }, { id: 'cv', icon: '▣', name: 'cv', ext: '.pdf' }, { id: 'stack', icon: '☰', name: 'stack', ext: '.json' }] },
-            { label: d.folderProjects, items: d.projects.filter(p => !p.isLoading).map(p => ({ id: p.id, icon: '◆', name: p.id, ext: '.case', isProject: true })) },
+            { label: d.folderProjects, items: d.projects.filter(p => !p.isLoading).map(p => ({ id: p.id, icon: '◆', name: p.id.replace(/-/g, '_'), ext: '.case', isProject: true })) },
             { label: d.folderEtc, items: [{ id: 'contact', icon: '@', name: 'contact', ext: '.md' }, { id: 'vibes', icon: '♪', name: 'now playing', ext: '.mp3' }] },
           ].map(folder => (
             <div key={folder.label} style={{ padding: '10px 10px 4px' }}>
@@ -986,8 +1026,8 @@ export function Portfolio() {
 
         {/* Status bar / Mobile nav */}
         <footer className="p-statusbar" style={{ gridArea: 'status', background: C.accent, color: '#fff', display: 'flex', alignItems: 'center', padding: '0 14px', gap: 14, fontSize: 10, letterSpacing: '0.04em', fontFamily: C.mono }}>
-          <span className="p-blink" style={{ color: '#22c55e' }}>●</span>
-          <span className="p-blink" style={{ color: '#22c55e' }}>{d.statReady}</span>
+          <span className="p-blink" style={{ color: 'var(--p-ready-dot)' }}>●</span>
+          <span className="p-blink" style={{ color: 'var(--p-ready-dot)' }}>{d.statReady}</span>
           <span style={{ opacity: 0.4 }}>|</span>
           <span>branch: main</span>
           <span style={{ opacity: 0.4 }}>|</span>
