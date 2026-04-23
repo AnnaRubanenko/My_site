@@ -189,7 +189,7 @@ export const DATA: Record<Lang, LangData> = {
         {
           role: 'Product Designer',
           company: 'AppSec Solutions',
-          period: 'февр. 2025 — март 2026 · 1 г. 2 мес.',
+          period: 'сент. 2024 — март 2026 · 1 г. 7 мес.',
           details: [
             'проектировала высоконагруженные интерфейсы для B2B-продуктов в сфере информационной безопасности',
             'прорабатывала пользовательский опыт от user flows и wireframes до high-fidelity прототипов',
@@ -202,7 +202,7 @@ export const DATA: Record<Lang, LangData> = {
         {
           role: 'UX / UI Designer',
           company: 'Grokhotov studio',
-          period: 'март 2024 — янв. 2025 · 11 мес.',
+          period: 'июль 2023 — дек. 2024 · 2 года',
           details: [
             'разрабатывала wireframes, макеты и интерактивные прототипы для презентации решений команде разработки и заказчикам',
             'создавала адаптивные дизайны, редизайнила существующие интерфейсы и улучшала пользовательские пути',
@@ -491,7 +491,7 @@ export const DATA: Record<Lang, LangData> = {
         {
           role: 'Product Designer',
           company: 'AppSec Solutions',
-          period: 'Feb 2025 — Mar 2026 · 1 yr 2 mos',
+          period: 'Sep 2024 — Mar 2026 · 1 yr 7 mos',
           details: [
             'designed complex high-load B2B interfaces for information-security products',
             'owned UX from user flows and wireframes to high-fidelity prototypes and developer-ready specs',
@@ -504,7 +504,7 @@ export const DATA: Record<Lang, LangData> = {
         {
           role: 'UX / UI Designer',
           company: 'Grokhotov studio',
-          period: 'Mar 2024 — Jan 2025 · 11 mos',
+          period: 'Jul 2023 — Dec 2024 · 2 yrs',
           details: [
             'created wireframes, interface layouts, and interactive prototypes for engineering teams and client presentations',
             'designed responsive interfaces, redesigned existing products, and improved user journeys',
