@@ -322,7 +322,7 @@ function CvView({ d, lang, onBack }: { d: LangData; lang: Lang; onBack: () => vo
               <p className="p-cv-role">{d.cv.headline}</p>
             </div>
           </div>
-          <a href="/portfolio/anna-demeshko-cv.pdf" download className="p-cv-download">
+          <a href={d.cv.downloadHref} download className="p-cv-download">
             {d.cv.downloadLabel}
           </a>
         </div>

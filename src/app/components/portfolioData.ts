@@ -70,6 +70,7 @@ export interface LangData {
   tooltipNavigate: string;
   cv: {
     downloadLabel: string;
+    downloadHref: string;
     photoSrc: string;
     headline: string;
     summary: string;
@@ -167,6 +168,7 @@ export const DATA: Record<Lang, LangData> = {
     tooltipNavigate: 'нажми, чтобы перейти',
     cv: {
       downloadLabel: 'скачать PDF',
+      downloadHref: '/portfolio/anna-demeshko-cv.pdf',
       photoSrc: '/portfolio/profile-binary-source.png',
       headline: 'Product Designer',
       summary: 'Специализируюсь на B2B и B2C продуктах в сфере информационной безопасности, где важны логика, структура и удобство взаимодействия. Создаю интерфейсы с продуманными сценариями, очевидной логикой и чистым дизайном. Хорошо взаимодействую с PM-ами, разработчиками и аналитиками на всех этапах.',
@@ -284,7 +286,7 @@ export const DATA: Record<Lang, LangData> = {
         year: '2025',
         tags: ['appsec', 'b2b', 'saas'],
         metric: { value: '−42%', label: 'время до запуска скана' },
-        problem: 'пользователи не понимали, когда сканирование реально запущено',
+        problem: 'спроектировала сценарий ручного запуска сканирования с понятными состояниями формы',
         role: 'lead product designer',
         cover: 'table',
         slides: [
@@ -307,7 +309,7 @@ export const DATA: Record<Lang, LangData> = {
         year: '2025',
         tags: ['appsec', 'b2b', 'saas'],
         metric: { value: '−68%', label: 'время на аудит' },
-        problem: 'аудиторам было сложно увидеть, что изменилось между релизами',
+        problem: 'спроектировала side-by-side сравнение сканирований с дельтами и детализацией',
         role: 'lead product designer',
         cover: 'diff',
         slides: [
@@ -329,7 +331,7 @@ export const DATA: Record<Lang, LangData> = {
         year: '2024',
         tags: ['crm', 'b2b', 'enterprise'],
         metric: { value: '−75%', label: 'лишние переходы' },
-        problem: 'у пользователей не было единой точки входа для мониторинга состояния безопасности',
+        problem: 'собрала кастомизируемый дашборд для мониторинга ключевых метрик безопасности',
         role: 'product designer',
         cover: 'kanban',
         slides: [
@@ -353,7 +355,7 @@ export const DATA: Record<Lang, LangData> = {
         year: '2025',
         tags: ['appsec', 'b2b', 'saas'],
         metric: { value: '−31%', label: 'время на обработку' },
-        problem: 'аналитикам было неудобно быстро обновлять статус и критичность уязвимости',
+        problem: 'собрала компактный triage-flow для редактирования статуса и параметров уязвимости',
         role: 'product designer',
         cover: 'table',
         slides: [
@@ -375,7 +377,7 @@ export const DATA: Record<Lang, LangData> = {
         year: '2025',
         tags: ['design system', 'b2b', 'documentation'],
         metric: { value: '6', label: 'компонентов добавлено в систему' },
-        problem: 'в продукте не хватало единых компонентов и прозрачных правил их использования',
+        problem: 'развила дизайн-систему: добавила компоненты и оформила для них документацию',
         role: 'product designer',
         cover: 'table',
         slides: [
@@ -469,6 +471,7 @@ export const DATA: Record<Lang, LangData> = {
     tooltipNavigate: 'click to navigate',
     cv: {
       downloadLabel: 'download PDF',
+      downloadHref: '/portfolio/anna-demeshko-cv-en.pdf',
       photoSrc: '/portfolio/profile-binary-source.png',
       headline: 'Product Designer',
       summary: 'I specialize in B2B and B2C information-security products where logic, structure, and interaction clarity matter most. I design interfaces with thoughtful scenarios, clear product logic, and clean visual systems, collaborating closely with PMs, engineers, and analysts.',
@@ -586,7 +589,7 @@ export const DATA: Record<Lang, LangData> = {
         year: '2025',
         tags: ['appsec', 'b2b', 'saas'],
         metric: { value: '−42%', label: 'time to scan launch' },
-        problem: "users didn't understand when a scan was actually launched",
+        problem: 'designed a manual scan launch flow with clear form states and feedback',
         role: 'lead product designer',
         cover: 'table',
         slides: [
@@ -609,7 +612,7 @@ export const DATA: Record<Lang, LangData> = {
         year: '2025',
         tags: ['appsec', 'b2b', 'saas'],
         metric: { value: '−68%', label: 'audit time' },
-        problem: 'auditors had a hard time seeing what changed between releases',
+        problem: 'designed a side-by-side scan comparison flow with deltas and detailed drill-down',
         role: 'lead product designer',
         cover: 'diff',
         slides: [
@@ -630,7 +633,7 @@ export const DATA: Record<Lang, LangData> = {
         year: '2024',
         tags: ['crm', 'b2b', 'enterprise'],
         metric: { value: '−75%', label: 'extra navigation' },
-        problem: 'users had no single entry point for monitoring their security posture',
+        problem: 'built a customizable dashboard for monitoring key security metrics in one place',
         role: 'product designer',
         cover: 'kanban',
         slides: [
@@ -652,7 +655,7 @@ export const DATA: Record<Lang, LangData> = {
         year: '2025',
         tags: ['appsec', 'b2b', 'saas'],
         metric: { value: '−31%', label: 'triage time' },
-        problem: 'analysts needed a faster way to update vulnerability status and severity',
+        problem: 'designed a compact triage flow for updating vulnerability status and attributes',
         role: 'product designer',
         cover: 'table',
         slides: [
@@ -674,7 +677,7 @@ export const DATA: Record<Lang, LangData> = {
         year: '2025',
         tags: ['design system', 'b2b', 'documentation'],
         metric: { value: '6', label: 'components added to the system' },
-        problem: 'the product lacked shared components and clear rules for how to use them',
+        problem: 'evolved the design system by adding components and documenting their usage',
         role: 'product designer',
         cover: 'table',
         slides: [
