@@ -34,6 +34,7 @@ export interface LangData {
   codeToday: string;
   codeComment: string;
   ctaTelegram: string;
+  ctaViewCv: string;
   secProjectsTitle: string;
   secProjectsMeta: string;
   secCvTitle: string;
@@ -132,6 +133,7 @@ export const DATA: Record<Lang, LangData> = {
     codeToday: 'делаю редизайны для души, изучаю нейросети',
     codeComment: '// в чём сильна',
     ctaTelegram: 'написать в телеграм',
+    ctaViewCv: 'смотреть CV',
     secProjectsTitle: 'projects/study_case',
     secProjectsMeta: 'исследования / синки / макеты / тесты => довольные пользователи',
     secCvTitle: 'cv',
@@ -435,6 +437,7 @@ export const DATA: Record<Lang, LangData> = {
     codeToday: 'redesigning for fun, exploring AI tools',
     codeComment: '// what i do best',
     ctaTelegram: 'message me on telegram',
+    ctaViewCv: 'view CV',
     secProjectsTitle: 'projects/study_case',
     secProjectsMeta: 'research / syncs / mockups / tests => happy users',
     secCvTitle: 'cv',

@@ -117,7 +117,7 @@ function PixelBat() {
 
 // ── README section ────────────────────────────────────────────────────────────
 
-function ReadmeSection({ d }: { d: LangData }) {
+function ReadmeSection({ d, onOpenCv }: { d: LangData; onOpenCv: () => void }) {
   return (
     <section id="readme" style={{ scrollMarginTop: 60 }}>
       <div className="p-readme-marker" style={{ fontSize: 11, color: C.muted, marginBottom: 14, fontFamily: C.mono }}>
@@ -132,13 +132,19 @@ function ReadmeSection({ d }: { d: LangData }) {
           <p style={{ fontFamily: C.sans, fontSize: 18, lineHeight: 1.55, color: C.ink, maxWidth: 620, margin: 0, whiteSpace: 'pre-line' }}>
             {d.lede}
           </p>
-          <a href="https://t.me/annademeshko" target="_blank" rel="noopener" className="p-tg-cta">
-            <svg width={14} height={14} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
-              <path d="M9.78 15.28l-.4 4.04c.57 0 .81-.24 1.11-.53l2.66-2.54 5.52 4.04c1.01.56 1.73.27 2-.94l3.63-17c.35-1.52-.55-2.11-1.53-1.75L1.5 9.34C.02 9.93.04 10.77 1.25 11.14l5.62 1.75 13.06-8.23c.61-.41 1.17-.18.71.22L9.78 15.28z" />
-            </svg>
-            {d.ctaTelegram}
-            <span>↗</span>
-          </a>
+          <div className="p-readme-cta-row">
+            <a href="https://t.me/annademeshko" target="_blank" rel="noopener" className="p-tg-cta">
+              <svg width={14} height={14} viewBox="0 0 24 24" fill="currentColor" aria-hidden>
+                <path d="M9.78 15.28l-.4 4.04c.57 0 .81-.24 1.11-.53l2.66-2.54 5.52 4.04c1.01.56 1.73.27 2-.94l3.63-17c.35-1.52-.55-2.11-1.53-1.75L1.5 9.34C.02 9.93.04 10.77 1.25 11.14l5.62 1.75 13.06-8.23c.61-.41 1.17-.18.71.22L9.78 15.28z" />
+              </svg>
+              {d.ctaTelegram}
+              <span>↗</span>
+            </a>
+            <button type="button" className="p-readme-cv-cta" onClick={onOpenCv}>
+              {d.ctaViewCv}
+              <span>↗</span>
+            </button>
+          </div>
         </div>
 
         <div className="p-readme-side">
@@ -1014,7 +1020,7 @@ export function Portfolio() {
               <CvView d={d} lang={lang} onBack={openPortfolio} />
             ) : (
               <>
-                <ReadmeSection d={d} />
+                <ReadmeSection d={d} onOpenCv={openCv} />
                 <ProjectsSection d={d} onOpenCase={openCase} />
                 <StackSection d={d} />
                 <ContactSection d={d} />
