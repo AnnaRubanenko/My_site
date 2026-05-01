@@ -1158,6 +1158,10 @@
   white-space: nowrap;
 }
 
+.p-readme-title-accent-mobile-ru {
+  display: none;
+}
+
 .p-readme-cta-row {
   display: flex;
   flex-wrap: wrap;
@@ -1494,6 +1498,38 @@
 }
 
 @media (max-width: 768px) {
+  html,
+  body,
+  #root,
+  .p-grid,
+  .p-main,
+  .p-editor {
+    max-width: 100% !important;
+    overflow-x: hidden !important;
+  }
+  .p-readme-head,
+  .p-readme-head > div,
+  .p-readme-title,
+  .p-readme-title-line,
+  .p-readme-marker,
+  .p-readme-cta-row,
+  .p-vibes,
+  .p-contact,
+  .p-proj,
+  .p-readme-stats {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+  .p-readme-title-line:first-child {
+    white-space: normal !important;
+  }
+  .p-readme-title-accent-mobile-ru {
+    display: inline !important;
+  }
+  .p-readme-title-accent-ru {
+    display: none !important;
+  }
   .p-readme-bat {
     display: block !important;
     top: -31px !important;
@@ -2059,7 +2095,6 @@
   .p-stack-grid { grid-template-columns: repeat(2, 1fr) !important; }
   .p-editor { padding: 16px 12px calc(72px + max(16px, env(safe-area-inset-bottom))) !important; }
   .p-readme-head h1 { font-size: 26px !important; }
-  .p-readme-title-line:first-child { white-space: normal !important; }
   .p-readme-head p { font-size: 15px !important; }
   .p-vibes-pixel-cta { font-size: 20px !important; }
 

@@ -117,7 +117,7 @@ function PixelBat() {
 
 // ── README section ────────────────────────────────────────────────────────────
 
-function ReadmeSection({ d, onOpenCv }: { d: LangData; onOpenCv: () => void }) {
+function ReadmeSection({ d, lang, onOpenCv }: { d: LangData; lang: Lang; onOpenCv: () => void }) {
   return (
     <section id="readme" style={{ scrollMarginTop: 60 }}>
       <div className="p-readme-marker" style={{ fontSize: 11, color: C.muted, marginBottom: 14, fontFamily: C.mono }}>
@@ -129,7 +129,16 @@ function ReadmeSection({ d, onOpenCv }: { d: LangData; onOpenCv: () => void }) {
           <h1 className="p-readme-title" style={{ fontFamily: C.sans, fontSize: 'clamp(34px, 5.2vw, 52px)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1, margin: '0 0 14px', color: C.ink }}>
             <span className="p-readme-title-line">
               {d.h1Line1}
-              <span style={{ color: C.accent2 }}> {d.h1Line1Accent}</span>
+              <span className={`p-readme-title-accent${lang === 'ru' ? ' p-readme-title-accent-ru' : ''}`} style={{ color: C.accent2 }}>
+                {' '}
+                {d.h1Line1Accent}
+              </span>
+              {lang === 'ru' ? (
+                <span className="p-readme-title-accent-mobile-ru" style={{ color: C.accent2 }}>
+                  {' '}
+                  product
+                </span>
+              ) : null}
             </span>
             <span className="p-readme-title-line" style={{ color: C.accent2, marginTop: 4 }}>{d.h1Line2}</span>
           </h1>
@@ -1024,7 +1033,7 @@ export function Portfolio() {
               <CvView d={d} lang={lang} onBack={openPortfolio} />
             ) : (
               <>
-                <ReadmeSection d={d} onOpenCv={openCv} />
+                <ReadmeSection d={d} lang={lang} onOpenCv={openCv} />
                 <ProjectsSection d={d} onOpenCase={openCase} />
                 <StackSection d={d} />
                 <ContactSection d={d} />
