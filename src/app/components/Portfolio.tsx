@@ -124,10 +124,14 @@ function ReadmeSection({ d, onOpenCv }: { d: LangData; onOpenCv: () => void }) {
         <b style={{ color: C.muted, fontWeight: 500 }}>{d.secMarker}</b>
       </div>
 
-      <div className="p-readme-head" style={{ display: 'grid', gridTemplateColumns: '1fr minmax(0, 340px)', gap: 30, alignItems: 'end' }}>
+      <div className="p-readme-head" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(280px, 300px)', gap: 24, alignItems: 'start' }}>
         <div>
-          <h1 style={{ fontFamily: C.sans, fontSize: 'clamp(38px, 6vw, 56px)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1, margin: '0 0 14px', color: C.ink }}>
-            {d.h1Line1}: <span style={{ color: C.accent2 }}>{d.h1Line2}</span>
+          <h1 className="p-readme-title" style={{ fontFamily: C.sans, fontSize: 'clamp(34px, 5.2vw, 52px)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1, margin: '0 0 14px', color: C.ink }}>
+            <span className="p-readme-title-line">
+              {d.h1Line1}
+              <span style={{ color: C.accent2 }}> {d.h1Line1Accent}</span>
+            </span>
+            <span className="p-readme-title-line" style={{ color: C.accent2, marginTop: 4 }}>{d.h1Line2}</span>
           </h1>
           <p style={{ fontFamily: C.sans, fontSize: 18, lineHeight: 1.55, color: C.ink, maxWidth: 620, margin: 0, whiteSpace: 'pre-line' }}>
             {d.lede}
@@ -1013,7 +1017,7 @@ export function Portfolio() {
         <main className="p-main" ref={mainRef} style={{ gridArea: 'main', overflowY: 'auto', scrollBehavior: 'smooth', background: C.bg, minWidth: 0 }}>
 
           {/* Editor */}
-          <div className="p-editor" id="editor" style={{ padding: '24px 40px 48px', maxWidth: 980, margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: 36 }}>
+          <div className="p-editor" id="editor" style={{ padding: '24px 40px 48px', maxWidth: 1120, margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: 36 }}>
             {currentCase && currentProject ? (
               <CaseView project={currentProject} d={d} onBack={closeCase} />
             ) : cvOpen ? (

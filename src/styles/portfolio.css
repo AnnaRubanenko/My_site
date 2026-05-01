@@ -1150,6 +1150,14 @@
 .p-vibes-code-op { color: var(--p-muted); }
 .p-vibes-code-string { color: var(--p-accent2); }
 /* ===== Telegram CTA ===== */
+.p-readme-title-line {
+  display: block;
+}
+
+.p-readme-title-line:first-child {
+  white-space: nowrap;
+}
+
 .p-readme-cta-row {
   display: flex;
   flex-wrap: wrap;
@@ -2051,6 +2059,7 @@
   .p-stack-grid { grid-template-columns: repeat(2, 1fr) !important; }
   .p-editor { padding: 16px 12px calc(72px + max(16px, env(safe-area-inset-bottom))) !important; }
   .p-readme-head h1 { font-size: 26px !important; }
+  .p-readme-title-line:first-child { white-space: normal !important; }
   .p-readme-head p { font-size: 15px !important; }
   .p-vibes-pixel-cta { font-size: 20px !important; }
 
