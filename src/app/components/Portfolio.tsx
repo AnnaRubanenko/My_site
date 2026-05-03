@@ -124,7 +124,7 @@ function ReadmeSection({ d, lang, onOpenCv }: { d: LangData; lang: Lang; onOpenC
         <b style={{ color: C.muted, fontWeight: 500 }}>{d.secMarker}</b>
       </div>
 
-      <div className="p-readme-head" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(320px, 350px)', gap: 24, alignItems: 'start' }}>
+      <div className="p-readme-head" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(360px, 390px)', gap: 24, alignItems: 'start' }}>
         <div>
           <h1 className="p-readme-title" style={{ fontFamily: C.sans, fontSize: 'clamp(34px, 5.2vw, 52px)', fontWeight: 500, letterSpacing: '-0.03em', lineHeight: 1, margin: '0 0 14px', color: C.ink }}>
             <span className="p-readme-title-line">
