@@ -3165,7 +3165,7 @@
 
 @media (max-width: 640px) {
   /* Smaller phones - maintain HIG standards */
-  .p-stack-grid { grid-template-columns: repeat(3, 1fr) !important; }
+  .p-stack-grid { grid-template-columns: repeat(4, 1fr) !important; }
   .p-editor { padding: 16px 16px calc(72px + max(16px, env(safe-area-inset-bottom))) !important; }
   .p-readme-head h1 { font-size: 28px !important; }
   .p-section-head h2 { font-size: 22px !important; }
@@ -3189,7 +3189,7 @@
 
 @media (max-width: 380px) {
   /* Very small phones - still maintain 44pt touch targets */
-  .p-stack-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .p-stack-grid { grid-template-columns: repeat(4, 1fr) !important; }
   .p-editor { padding: 16px 12px calc(72px + max(16px, env(safe-area-inset-bottom))) !important; }
   .p-readme-head h1 { font-size: 26px !important; }
   .p-readme-head p { font-size: 15px !important; }
