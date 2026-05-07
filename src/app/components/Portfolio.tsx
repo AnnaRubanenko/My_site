@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { DATA, Lang, LangData, Project } from './portfolioData';
+import { DATA, Lang, LangData, Project, CaseRepositoryFlowCopy } from './portfolioData';
 import { STACK_ICONS } from './StackIcons';
 
 // ── Color constants ──────────────────────────────────────────────────────────
@@ -38,6 +38,16 @@ const C = {
   mobilePressBg: 'var(--p-mobile-press-bg)',
   tgInk: 'var(--p-tg-ink)',
 } as const;
+
+const SITE_BASE = import.meta.env.BASE_URL || '/';
+
+function withSiteBase(value?: string) {
+  if (!value) return value;
+  const normalizedBase = SITE_BASE.endsWith('/') ? SITE_BASE : `${SITE_BASE}/`;
+  if (value === '/portfolio' || value === '/portfolio/') return normalizedBase;
+  if (value.startsWith('/portfolio/')) return `${normalizedBase}${value.slice('/portfolio/'.length)}`;
+  return value;
+}
 
 // ── Tiny shared components ────────────────────────────────────────────────────
 
@@ -108,9 +118,9 @@ function PixelBat() {
       }}
     >
       <span className="p-readme-bat-bubble">{batPhrases[phraseIndex]}</span>
-      <img src="/portfolio/bat.png" alt="" className="p-readme-bat-img p-readme-bat-body" />
-      <img src="/portfolio/bat.png" alt="" className="p-readme-bat-img p-readme-bat-wing-layer p-readme-bat-wing-layer-left" />
-      <img src="/portfolio/bat.png" alt="" className="p-readme-bat-img p-readme-bat-wing-layer p-readme-bat-wing-layer-right" />
+      <img src={withSiteBase('/portfolio/bat.png')} alt="" className="p-readme-bat-img p-readme-bat-body" />
+      <img src={withSiteBase('/portfolio/bat.png')} alt="" className="p-readme-bat-img p-readme-bat-wing-layer p-readme-bat-wing-layer-left" />
+      <img src={withSiteBase('/portfolio/bat.png')} alt="" className="p-readme-bat-img p-readme-bat-wing-layer p-readme-bat-wing-layer-right" />
     </button>
   );
 }
@@ -194,71 +204,223 @@ function ReadmeSection({ d, lang, onOpenCv }: { d: LangData; lang: Lang; onOpenC
 
 // ── Projects section ──────────────────────────────────────────────────────────
 
-function ProjectRow({ p, idx, onOpenCase }: { p: Project; idx: number; onOpenCase: (id: string) => void }) {
+const HIDDEN_PROJECT_IDS = new Set(['scan-compare', 'triage']);
+
+function textFromHtml(value?: string) {
+  return (value || '')
+    .replace(/<[^>]+>/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function projectSolutionSummary(project: Project) {
+  const [mainSolution] = textFromHtml(project.solution).split(' impact:');
+  return mainSolution || textFromHtml(project.task);
+}
+
+const PROJECT_CARD_COPY: Record<Lang, Record<string, { problem: string; action: string }>> = {
+  ru: {
+    copilot: {
+      problem: 'Security-командам нужно было быстро разбирать много уязвимостей без потери контекста.',
+      action: 'Собрала workflow с таблицей, side panel, доказательствами и управляемыми решениями.',
+    },
+    dashboards: {
+      problem: 'Метрики были разбросаны по разделам, а командам нужен был свой рабочий dashboard.',
+      action: 'Спроектировала настраиваемые виджеты: выбор, resize, drag-and-drop и expanded view.',
+    },
+    'wave-copilot': {
+      problem: 'Аналитикам нужна была AI-помощь в SAST-триаже, но без слепого доверия модели.',
+      action: 'Встроила CoPilot в контекст скана: режим анализа, confidence, объяснение и финальное решение.',
+    },
+    design_system: {
+      problem: 'Повторяющиеся UI-паттерны жили отдельно и по-разному трактовались дизайном и разработкой.',
+      action: 'Описала 6 компонентов дизайн-системы: структура, состояния, правила и handoff.',
+    },
+  },
+  en: {
+    copilot: {
+      problem: 'Security teams needed to review many vulnerabilities without losing decision context.',
+      action: 'Designed a workflow with a table, side panel, evidence, and governed actions.',
+    },
+    dashboards: {
+      problem: 'Security metrics were scattered across sections, while teams needed their own daily dashboard.',
+      action: 'Designed configurable widgets: selection, resize, drag-and-drop, and expanded analysis.',
+    },
+    'wave-copilot': {
+      problem: 'Analysts needed AI support for SAST triage without blindly trusting the model.',
+      action: 'Brought CoPilot into scan context with analysis modes, confidence, explanation, and final decision.',
+    },
+    design_system: {
+      problem: 'Recurring UI patterns were interpreted differently across design and engineering.',
+      action: 'Documented 6 system components: anatomy, states, rules, and handoff guidance.',
+    },
+  },
+};
+
+const PROJECT_CARD_TITLES: Record<Lang, Record<string, string>> = {
+  ru: {
+    copilot: 'Copilot — Анализ Репозиториев И Workflow Решений',
+    dashboards: 'Дашборды Для Аналитики ИБ',
+    'wave-copilot': 'Wave — AI-Анализ Уязвимостей',
+    design_system: 'Развитие Дизайн-Системы',
+  },
+  en: {
+    copilot: 'CoPilot Reports — AppSec Scan Results Workspace',
+    dashboards: 'Dashboards For Security Analytics',
+    'wave-copilot': 'Wave — In-Context AI Vulnerability Analysis',
+    design_system: 'Design System Evolution',
+  },
+};
+
+function projectCardCopy(project: Project, lang: Lang) {
+  return PROJECT_CARD_COPY[lang][project.id] || {
+    problem: project.problem,
+    action: projectSolutionSummary(project),
+  };
+}
+
+function projectCardTitle(project: Project, lang: Lang) {
+  return PROJECT_CARD_TITLES[lang][project.id] || project.title;
+}
+
+function ProjectCard({
+  p,
+  idx,
+  onOpenCase,
+  ctaLabel,
+  problemLabel,
+  actionLabel,
+  lang,
+}: {
+  p: Project;
+  idx: number;
+  onOpenCase: (id: string) => void;
+  ctaLabel: string;
+  problemLabel: string;
+  actionLabel: string;
+  lang: Lang;
+}) {
   const [hovered, setHovered] = useState(false);
+  const [slideIdx, setSlideIdx] = useState(0);
+  const slides = (p.slides || []).filter(slide => slide.image);
+  const activeSlide = slides[slideIdx % Math.max(slides.length, 1)];
+  const copy = projectCardCopy(p, lang);
+  const title = projectCardTitle(p, lang);
 
   if (p.isLoading) {
     return (
-      <div id={p.id} className="p-proj p-proj-loading-bar">
+      <div id={p.id} className="p-project-card p-project-card-loading">
         <span className="p-proj-loading-spinner" />
         <span>{p.title}</span>
       </div>
     );
   }
 
+  const moveSlide = (direction: -1 | 1, event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    if (!slides.length) return;
+    setSlideIdx(index => (index + direction + slides.length) % slides.length);
+  };
+
   return (
-    <button
-      key={p.id}
+    <article
       id={p.id}
-      className="p-proj"
-      onClick={() => onOpenCase(p.id)}
+      className={`p-project-card${hovered ? ' p-project-card-hovered' : ''}`}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div style={{ fontSize: 11, color: C.muted, fontVariantNumeric: 'tabular-nums', fontFamily: C.mono }}>
-        {String(idx + 1).padStart(2, '0')}
+      <button type="button" className="p-project-card-hit" onClick={() => onOpenCase(p.id)} aria-label={`${ctaLabel}: ${title}`} />
+
+      <div className="p-project-card-media">
+        {activeSlide?.image ? (
+          <img src={withSiteBase(activeSlide.image)} alt={activeSlide.alt || p.subtitle} />
+        ) : (
+          <div className="p-project-card-media-placeholder">
+            <span>{p.subtitle}</span>
+          </div>
+        )}
       </div>
-      <div style={{ minWidth: 0 }}>
-        <div style={{ fontFamily: C.sans, fontSize: 19, fontWeight: 500, letterSpacing: '-0.01em', marginBottom: 3, lineHeight: 1.2, color: hovered ? C.accent2 : C.ink, transition: 'color 0.15s ease', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-          {p.title}<span style={{ color: C.muted, fontWeight: 400, fontFamily: C.mono, fontSize: 14 }}>.case</span>
+
+      {slides.length > 1 ? (
+        <div className="p-project-card-controls">
+          <button type="button" onClick={event => moveSlide(-1, event)} aria-label="previous screenshot">‹</button>
+          <div>
+            {slides.map((_, i) => (
+              <button
+                key={`${p.id}-slide-${i}`}
+                type="button"
+                className={i === slideIdx ? 'p-active' : ''}
+                onClick={event => {
+                  event.stopPropagation();
+                  setSlideIdx(i);
+                }}
+                aria-label={`show screenshot ${i + 1}`}
+              />
+            ))}
+          </div>
+          <button type="button" onClick={event => moveSlide(1, event)} aria-label="next screenshot">›</button>
         </div>
-        <div style={{ fontSize: 11, color: C.muted, lineHeight: 1.4 }}>{p.problem}</div>
+      ) : null}
+
+      <div className="p-project-card-body">
+        <div className="p-project-card-kicker">
+          <span>{String(idx + 1).padStart(2, '0')}</span>
+          <span>{p.year}</span>
+        </div>
+
+        <h3>{title}</h3>
+
+        <div className="p-project-card-copy">
+          <p><strong>{problemLabel}</strong> {copy.problem}</p>
+          <p><strong>{actionLabel}</strong> {copy.action}</p>
+        </div>
       </div>
-      <div className="p-proj-meta-row">
-        <div className="p-proj-tags-col" style={{ display: 'flex', gap: 4, flexWrap: 'wrap' as const }}>
+
+      <div className="p-project-card-footer">
+        <div className="p-project-card-tags">
           {p.tags.map(t => (
-            <span key={t} style={{
-              fontSize: 9, padding: '2px 6px',
-              border: `1px solid ${hovered ? C.accent2 : C.line}`,
-              borderRadius: 2,
-              color: hovered ? C.accent2 : C.muted,
-              background: hovered ? C.tagBgStrong : 'transparent',
-              textTransform: 'lowercase' as const,
-              fontFamily: C.mono,
-              transition: 'color 0.15s ease, border-color 0.15s ease, background 0.15s ease',
-            }}>
-              {t}
-            </span>
+            <span key={t}>{t}</span>
           ))}
         </div>
-        <div className="p-proj-metric" style={{ fontFamily: C.sans, fontSize: 18, fontWeight: 500, letterSpacing: '-0.01em', lineHeight: 1 }}>
-          <span style={{ color: C.accent2 }}>{p.metric.value}</span>
-          <span style={{ display: 'block', fontFamily: C.mono, fontSize: 10, color: C.muted, fontWeight: 400, marginTop: 4 }}>{p.metric.label}</span>
+        <div className="p-project-card-metric">
+          <span>{p.metric.value}</span>
+          <span>{p.metric.label}</span>
         </div>
       </div>
-    </button>
+    </article>
   );
 }
 
-function ProjectsSection({ d, onOpenCase }: { d: LangData; onOpenCase: (id: string) => void }) {
+function ProjectsSection({ d, onOpenCase, lang }: { d: LangData; onOpenCase: (id: string) => void; lang: Lang }) {
+  const visibleProjects = d.projects.filter(project => !project.isLoading && !HIDDEN_PROJECT_IDS.has(project.id));
+  const loadingProjects = d.projects.filter(project => project.isLoading);
+  const ctaLabel = lang === 'ru' ? 'просмотреть кейс' : 'view case';
+  const problemLabel = lang === 'ru' ? 'проблема:' : 'problem:';
+  const actionLabel = lang === 'ru' ? 'что я сделала:' : 'what i did:';
+
   return (
     <section id="projects" style={{ scrollMarginTop: 60 }}>
       <SectionHead title={d.secProjectsTitle} ext="/" meta={d.secProjectsMeta} />
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        {d.projects.map((p, i) => (
-          <ProjectRow key={p.id} p={p} idx={i} onOpenCase={onOpenCase} />
+      <div className="p-project-card-grid">
+        {visibleProjects.map((p, i) => (
+          <ProjectCard
+            key={p.id}
+            p={p}
+            idx={i}
+            onOpenCase={onOpenCase}
+            ctaLabel={ctaLabel}
+            problemLabel={problemLabel}
+            actionLabel={actionLabel}
+            lang={lang}
+          />
         ))}
       </div>
+      {loadingProjects.map(project => (
+        <div key={project.id} className="p-project-loading-strip">
+          <span className="p-proj-loading-spinner" />
+          <span>{project.title}</span>
+        </div>
+      ))}
     </section>
   );
 }
@@ -311,7 +473,7 @@ function CvView({ d, lang, onBack }: { d: LangData; lang: Lang; onBack: () => vo
 
     return (
       <a
-        href={c.href || '#'}
+        href={withSiteBase(c.href) || '#'}
         className="p-cv-contact"
         target={!isEmail && c.href?.startsWith('http') ? '_blank' : undefined}
         rel="noreferrer"
@@ -335,13 +497,13 @@ function CvView({ d, lang, onBack }: { d: LangData; lang: Lang; onBack: () => vo
       <div className="p-cv-shell">
         <div className="p-cv-top">
           <div className="p-cv-person">
-            <img src={d.cv.photoSrc} alt={d.name} className="p-cv-photo" />
+            <img src={withSiteBase(d.cv.photoSrc)} alt={d.name} className="p-cv-photo" />
             <div>
               <h2 className="p-cv-name">{d.name}</h2>
               <p className="p-cv-role">{d.cv.headline}</p>
             </div>
           </div>
-          <a href={d.cv.downloadHref} download className="p-cv-download">
+          <a href={withSiteBase(d.cv.downloadHref)} download className="p-cv-download">
             {d.cv.downloadLabel}
           </a>
         </div>
@@ -456,7 +618,7 @@ function EmailContactRow({ c, d }: { c: { label: string; value: string; href: st
 
   return (
     <a
-      href={c.href}
+      href={withSiteBase(c.href)}
       className="p-contact"
       onClick={handleClick}
       onMouseEnter={() => setHovered(true)}
@@ -517,7 +679,7 @@ function LinkContactRow({ c, d }: { c: { label: string; value: string; href: str
 
   return (
     <a
-      href={c.href}
+      href={withSiteBase(c.href)}
       className="p-contact"
       target="_blank"
       rel="noopener noreferrer"
@@ -563,7 +725,7 @@ function ContactSection({ d }: { d: LangData }) {
           ) : (c.label === 'telegram' || c.label === 'linkedin') ? (
             <LinkContactRow key={c.label} c={c} d={d} />
           ) : (
-            <a key={c.label} href={c.href} className="p-contact" target={c.href.startsWith('http') ? '_blank' : undefined} rel="noreferrer">
+            <a key={c.label} href={withSiteBase(c.href)} className="p-contact" target={c.href.startsWith('http') ? '_blank' : undefined} rel="noreferrer">
               <span style={{ color: C.muted, fontSize: 11, textTransform: 'uppercase' as const, letterSpacing: '0.08em' }}>{c.label}</span>
               <span>{c.value}</span>
               <span className="p-contact-arrow">↗</span>
@@ -592,7 +754,7 @@ function VibesSection({ d }: { d: LangData }) {
     <section id="vibes" style={{ scrollMarginTop: 60 }}>
       <SectionHead title={d.secVibesTitle} ext=".mp3" meta={d.secVibesMeta} />
       <a
-        href={d.vibesPlaylistHref}
+        href={withSiteBase(d.vibesPlaylistHref)}
         target="_blank"
         rel="noopener noreferrer"
         className="p-vibes"
@@ -608,7 +770,7 @@ function VibesSection({ d }: { d: LangData }) {
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 14, minWidth: 0 }}>
           <img
-            src={trackArtwork}
+            src={withSiteBase(trackArtwork)}
             alt={trackArtworkAlt}
             style={{
               width: 54,
@@ -668,59 +830,287 @@ function VibesSection({ d }: { d: LangData }) {
 
 const BLOCK_COLORS = {
   task:     { border: '#4b3bff', comment: '#a798ff', hl: '#a798ff', hlBg: 'rgba(75,59,255,0.18)' },
+  teamRole: { border: '#1db954', comment: '#72e69a', hl: '#72e69a', hlBg: 'rgba(29,185,84,0.14)' },
   problem:  { border: '#ff5f57', comment: '#ff8a8a', hl: '#ffb0b0', hlBg: 'rgba(255,95,87,0.14)' },
   process:  { border: '#ff8a4c', comment: '#ffb36f', hl: '#ffb36f', hlBg: 'rgba(255,138,76,0.14)' },
   solution: { border: '#d4fb3c', comment: '#d4fb3c', hl: '#d4fb3c', hlBg: 'rgba(212,251,60,0.12)' },
+  overview: { border: '#4b3bff', comment: '#a798ff', hl: '#a798ff', hlBg: 'rgba(75,59,255,0.18)' },
+  goals: { border: '#d4fb3c', comment: '#d4fb3c', hl: '#d4fb3c', hlBg: 'rgba(212,251,60,0.12)' },
+  role: { border: '#1db954', comment: '#72e69a', hl: '#72e69a', hlBg: 'rgba(29,185,84,0.14)' },
+  discovery: { border: '#ff8a4c', comment: '#ffb36f', hl: '#ffb36f', hlBg: 'rgba(255,138,76,0.14)' },
+  strategy: { border: '#4b7dff', comment: '#8fb0ff', hl: '#8fb0ff', hlBg: 'rgba(75,125,255,0.16)' },
+  why: { border: '#25d0c8', comment: '#78eee8', hl: '#78eee8', hlBg: 'rgba(37,208,200,0.14)' },
+  ux: { border: '#ffcc66', comment: '#ffd98c', hl: '#ffd98c', hlBg: 'rgba(255,204,102,0.14)' },
+  system: { border: '#b7a8ff', comment: '#c9bdff', hl: '#c9bdff', hlBg: 'rgba(183,168,255,0.16)' },
+  tradeoffs: { border: '#ff6fb1', comment: '#ffa3ca', hl: '#ffa3ca', hlBg: 'rgba(255,111,177,0.14)' },
+  outcome: { border: '#66e080', comment: '#98f2aa', hl: '#98f2aa', hlBg: 'rgba(102,224,128,0.14)' },
 } as const;
 
 function CaseCodeBlock({ type, label, text }: { type: keyof typeof BLOCK_COLORS; label: string; text: string }) {
   const bc = BLOCK_COLORS[type];
-  const html = text.replace(
+  const lineNoStyle = { color: C.dim, display: 'inline-block', width: 18, textAlign: 'right' as const, marginRight: 10 };
+  const renderInlineHtml = (value: string) => value.replace(
     /<em>(.*?)<\/em>/g,
     `<em style="font-style:normal;color:${bc.hl};background:${bc.hlBg};padding:0 3px;border-radius:2px;">$1</em>`
+  ).replace(
+    /<i>(.*?)<\/i>/g,
+    '<i style="font-style:italic;">$1</i>'
   );
+  const contentLines = text.split('\n');
+
   return (
     <div style={{
       background: C.panel, border: `1px solid ${C.line}`, borderLeft: `3px solid ${bc.border}`,
-      borderRadius: 6, padding: '12px 18px', fontFamily: C.mono, fontSize: 12.5, lineHeight: 1.75, color: C.ink, overflowX: 'auto',
+      borderRadius: 6, padding: '12px 14px', fontFamily: C.mono, fontSize: 12.5, lineHeight: 1.75, color: C.ink, overflowX: 'auto',
     }}>
       <div>
-        <span style={{ color: C.dim, display: 'inline-block', width: 22, textAlign: 'right', marginRight: 14 }}>1</span>
+        <span style={lineNoStyle}>1</span>
         <span style={{ color: bc.comment }}>// {label}</span>
       </div>
       <div>
-        <span style={{ color: C.dim, display: 'inline-block', width: 22, textAlign: 'right', marginRight: 14 }}>2</span>
+        <span style={lineNoStyle}>2</span>
         <Kw c="const" /> <span style={{ color: C.function }}>{type}</span> = () =&gt; (
       </div>
       <div style={{ display: 'flex', alignItems: 'flex-start', padding: '6px 0' }}>
-        <span style={{ color: C.dim, display: 'inline-block', width: 22, textAlign: 'right', marginRight: 14, flexShrink: 0 }}>3</span>
+        <span style={{ ...lineNoStyle, flexShrink: 0 }}>3</span>
         <div
-          style={{ fontFamily: C.mono, fontSize: 13, lineHeight: 1.75, color: C.ink, flex: 1, minWidth: 0, paddingLeft: 2, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
-          dangerouslySetInnerHTML={{ __html: html }}
-        />
+          style={{ fontFamily: C.mono, fontSize: 13, lineHeight: 1.88, color: C.ink, flex: 1, minWidth: 0, paddingLeft: 1 }}
+        >
+          {contentLines.map((line, index) => {
+            if (!line.trim()) {
+              return <div key={index} style={{ height: '1.75em' }} />;
+            }
+
+            const listMatch = line.match(/^\s*>>\s?(.*)$/);
+            if (listMatch) {
+              return (
+                <div key={index} style={{ display: 'grid', gridTemplateColumns: '26px minmax(0, 1fr)', columnGap: 10, alignItems: 'start', marginTop: index > 0 ? 1 : 0 }}>
+                  <span style={{ color: C.dim, textAlign: 'right' }}>&gt;&gt;</span>
+                  <span
+                    style={{ minWidth: 0, wordBreak: 'break-word' }}
+                    dangerouslySetInnerHTML={{ __html: renderInlineHtml(listMatch[1]) }}
+                  />
+                </div>
+              );
+            }
+
+            return (
+              <div
+                key={index}
+                style={{ whiteSpace: 'pre-wrap', wordBreak: 'break-word', marginTop: index > 0 ? 1 : 0 }}
+                dangerouslySetInnerHTML={{ __html: renderInlineHtml(line) }}
+              />
+            );
+          })}
+        </div>
       </div>
       <div>
-        <span style={{ color: C.dim, display: 'inline-block', width: 22, textAlign: 'right', marginRight: 14 }}>4</span>);
+        <span style={lineNoStyle}>4</span>);
       </div>
     </div>
   );
 }
 
+function CaseInlineScreenshots({ screenshots }: { screenshots: NonNullable<Project['caseInlineScreenshots']> }) {
+  const [idx, setIdx] = useState(0);
+  const current = screenshots[idx];
+  const total = screenshots.length;
+
+  return (
+    <div className="p-case-inline-screenshots">
+      <div className="p-case-inline-screen">
+        <img src={withSiteBase(current.image)} alt={current.alt} />
+      </div>
+      <div className="p-case-inline-controls">
+        <button className="p-slider-btn" onClick={() => setIdx(i => (i - 1 + total) % total)} aria-label="previous screenshot">
+          <svg width={12} height={12} viewBox="0 0 16 16" fill="none">
+            <path d="M10 3.5L5.5 8l4.5 4.5" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+        <span>{idx + 1} / {total}</span>
+        <div className="p-case-inline-dots">
+          {screenshots.map((shot, i) => (
+            <button key={shot.image} className={`p-slider-dot${i === idx ? ' p-active' : ''}`} onClick={() => setIdx(i)} aria-label={`screenshot ${i + 1}`} />
+          ))}
+        </div>
+        <button className="p-slider-btn" onClick={() => setIdx(i => (i + 1) % total)} aria-label="next screenshot">
+          <svg width={12} height={12} viewBox="0 0 16 16" fill="none">
+            <path d="M6 3.5L10.5 8 6 12.5" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+}
+
+const DEFAULT_REPOSITORY_FLOW_COPY: CaseRepositoryFlowCopy = {
+  title: 'Product Strategy: Split-screen Workspace',
+  intro: 'Instead of a classic list → open page → back flow, I designed a dual-pane workspace. The reports list works as a command center, while the detail panel keeps analysis, evidence, and actions immediately available.',
+  leftLabel: 'left:',
+  leftTitle: 'Reports overview',
+  leftItems: [
+    'Report history, progress, prediction, match, total issues, format, and date',
+    'Compact rows support fast scanning across high-volume report lists',
+    'The table stays visible while the user investigates a selected report',
+  ],
+  rightLabel: 'right:',
+  rightTitle: 'Deep-dive report analysis',
+  rightItems: [
+    'RL / LLM / Advice comparison stays in context',
+    'Severity distribution and vulnerability list guide prioritization',
+    'Parameters, rules, and actions support technical review and governance',
+  ],
+  decisionIntro: 'For each finding, users can confirm vulnerability, mark not vulnerability, or ignore it in future scans. These are high-risk actions, so the interaction model adds just enough friction to prevent accidental decisions.',
+  actionsLabel: 'actions:',
+  actionsTitle: 'Confirm / Decline / Ignore',
+  actionItems: [
+    { label: 'confirm', text: 'mark the finding as a real vulnerability' },
+    { label: 'decline', text: 'mark it as not a vulnerability / false positive' },
+    { label: 'ignore', text: 'exclude the object from the following scans' },
+  ],
+  safetyLabel: 'safety layer',
+  safetyItems: [
+    'Hover tooltips explain the action before click',
+    'Confirmation modals protect high-risk decisions',
+    'Toast feedback confirms the result and keeps triage moving',
+  ],
+  whyTitle: 'Why this works',
+  whyItems: [
+    { label: 'Zero-context switching:', text: 'users stay in one operational space.' },
+    { label: 'Faster scanning:', text: 'the list works as a command center.' },
+    { label: 'Better decision confidence:', text: 'details and actions are available immediately.' },
+    { label: 'Enterprise efficiency:', text: 'the structure supports high-volume triage.' },
+  ],
+  choicesTitle: 'Design choices',
+  choicesItems: [
+    { label: 'Dual-pane layout:', text: 'faster than opening and closing separate detail pages.' },
+    { label: 'Status timeline:', text: 'Waiting → RL → LLM → Advice → Completed / Failed shows the system process.' },
+    { label: 'Confirmation modals:', text: 'high-risk actions need error prevention and audit confidence.' },
+    { label: 'Semantic color:', text: 'in AppSec, color is a language for risk and system state.' },
+  ],
+};
+
+function CaseRepositoryFlow({
+  screenshots,
+  copy = DEFAULT_REPOSITORY_FLOW_COPY,
+}: {
+  screenshots?: Project['caseInlineScreenshots'];
+  copy?: CaseRepositoryFlowCopy;
+}) {
+  return (
+    <section className="p-case-flow-card p-case-flow-card-blue">
+      <h2>{copy.title}</h2>
+      <p className="p-case-flow-line">{copy.intro}</p>
+      <div className="p-case-article-grid p-case-workspace-grid">
+        <article className="p-case-workspace-card p-case-workspace-card-left">
+          <h4><span>{copy.leftLabel}</span> {copy.leftTitle}</h4>
+          <ul>
+            {copy.leftItems.map(item => <li key={item}>{item}</li>)}
+          </ul>
+        </article>
+        <article className="p-case-workspace-card p-case-workspace-card-right">
+          <h4><span>{copy.rightLabel}</span> {copy.rightTitle}</h4>
+          <ul>
+            {copy.rightItems.map(item => <li key={item}>{item}</li>)}
+          </ul>
+        </article>
+      </div>
+
+      {screenshots?.length ? <CaseInlineScreenshots screenshots={screenshots} /> : null}
+
+      <p className="p-case-flow-line">{copy.decisionIntro}</p>
+      <div className="p-case-article-grid p-case-workspace-grid">
+        <article className="p-case-workspace-card p-case-workspace-card-left p-case-ignore-risk">
+          <h4><span>{copy.actionsLabel}</span> {copy.actionsTitle}</h4>
+          <ul>
+            {copy.actionItems.map(item => (
+              <li key={item.label}><strong>{item.label}</strong> — {item.text}</li>
+            ))}
+          </ul>
+        </article>
+        <article className="p-case-workspace-card p-case-workspace-card-right p-case-ignore-control">
+          <h4><span>{copy.safetyLabel}</span>{copy.safetyTitle ? ` ${copy.safetyTitle}` : ''}</h4>
+          <ul>
+            {copy.safetyItems.map(item => <li key={item}>{item}</li>)}
+          </ul>
+        </article>
+      </div>
+
+      <div className="p-case-flow-reasons">
+        <article>
+          <h2>{copy.whyTitle}</h2>
+          <ul>
+            {copy.whyItems.map(item => (
+              <li key={item.label}><strong>{item.label}</strong> <span>{item.text}</span></li>
+            ))}
+          </ul>
+        </article>
+        <article className="p-case-flow-decision">
+          <h2>{copy.choicesTitle}</h2>
+          <ul>
+            {copy.choicesItems.map(item => (
+              <li key={item.label}><strong>{item.label}</strong> <span>{item.text}</span></li>
+            ))}
+          </ul>
+        </article>
+      </div>
+    </section>
+  );
+}
+
+function CaseArticle({
+  html,
+  screenshots,
+  flowCopy,
+}: {
+  html: string;
+  screenshots?: Project['caseInlineScreenshots'];
+  flowCopy?: Project['caseRepositoryFlowCopy'];
+}) {
+  const repositoryMarker = '<div data-case-flow="repository"></div>';
+  const [beforeRepository, afterRepository = ''] = html.split(repositoryMarker);
+  const afterWithoutIgnoreMarker = afterRepository.replace('<div data-case-flow="ignore"></div>', '');
+
+  return (
+    <article className="p-case-article">
+      <div dangerouslySetInnerHTML={{ __html: beforeRepository }} />
+      <CaseRepositoryFlow screenshots={screenshots} copy={flowCopy} />
+      {afterWithoutIgnoreMarker ? <div dangerouslySetInnerHTML={{ __html: afterWithoutIgnoreMarker }} /> : null}
+    </article>
+  );
+}
+
 function CaseView({ project, d, onBack }: { project: Project; d: LangData; onBack: () => void }) {
   const [slideIdx, setSlideIdx] = useState(0);
-  const [activeInfoTab, setActiveInfoTab] = useState<keyof typeof BLOCK_COLORS>('task');
+  const [activeInfoTab, setActiveInfoTab] = useState('task');
   const slides = (project.slides && project.slides.length)
     ? project.slides
     : [{ cover: project.cover, caption: project.caption || project.subtitle }];
   const current = slides[slideIdx];
   const total = slides.length;
-  const infoTabs = [
-    { type: 'task' as const, label: d.caseTaskLabel, text: project.task },
-    { type: 'problem' as const, label: d.caseProblemLabel, text: project.problemFull },
-    ...(project.process ? [{ type: 'process' as const, label: d.caseProcessLabel, text: project.process }] : []),
-    { type: 'solution' as const, label: d.caseSolutionLabel, text: project.solution },
+  const defaultInfoTabs = [
+    { id: 'task', tone: 'task' as const, label: d.caseTaskLabel, codeLabel: d.caseTaskLabel, text: project.task },
+    { id: 'problem', tone: 'problem' as const, label: d.caseProblemLabel, codeLabel: d.caseProblemLabel, text: project.problemFull },
+    ...(project.process ? [{ id: 'process', tone: 'process' as const, label: d.caseProcessLabel, codeLabel: d.caseProcessLabel, text: project.process }] : []),
+    { id: 'solution', tone: 'solution' as const, label: d.caseSolutionLabel, codeLabel: d.caseSolutionLabel, text: project.solution },
+    ...(project.teamRole ? [{ id: 'teamRole', tone: 'teamRole' as const, label: d.caseTeamRoleLabel, codeLabel: d.caseTeamRoleLabel, text: project.teamRole }] : []),
   ];
-  const activeInfo = infoTabs.find(tab => tab.type === activeInfoTab) || infoTabs[0];
+  const infoTabs = project.caseTabs?.length
+    ? project.caseTabs.map(tab => ({
+      id: tab.id,
+      tone: tab.tone,
+      label: tab.label,
+      codeLabel: tab.codeLabel,
+      text: tab.text,
+    }))
+    : defaultInfoTabs;
+  const activeInfo = infoTabs.find(tab => tab.id === activeInfoTab) || infoTabs[0];
+  const useBottomScreenshots = Boolean(project.caseTabs?.length && project.caseInlineScreenshots?.length);
+
+  useEffect(() => {
+    setActiveInfoTab(infoTabs[0]?.id || 'task');
+    setSlideIdx(0);
+  }, [project.id]);
 
   return (
     <section id="case" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
@@ -743,88 +1133,116 @@ function CaseView({ project, d, onBack }: { project: Project; d: LangData; onBac
         </div>
       </div>
 
-      {/* Screen widget */}
-      <div style={{ border: `1px solid ${C.line}`, borderRadius: 6, background: C.panel, overflow: 'hidden' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderBottom: `1px solid ${C.line}`, background: C.panel2 }}>
-          <MacDots />
-          <span style={{ fontFamily: C.mono, fontSize: 11, color: C.muted, marginLeft: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            ~/{project.id}.case — {project.subtitle}
-          </span>
+      {project.caseArticleHtml ? (
+        <CaseArticle
+          html={project.caseArticleHtml}
+          screenshots={project.caseInlineScreenshots}
+          flowCopy={project.caseRepositoryFlowCopy}
+        />
+      ) : (
+        <div className={`p-case-info-tabs p-case-info-tabs-${project.id}`}>
+          <div className="p-case-info-tablist" role="tablist" aria-label="case details">
+            {infoTabs.map(tab => (
+              <button
+                key={tab.id}
+                type="button"
+                role="tab"
+                aria-selected={activeInfo.id === tab.id}
+                className={`p-case-info-tab p-case-info-tab-${tab.tone}${activeInfo.id === tab.id ? ' p-active' : ''}`}
+                onClick={() => setActiveInfoTab(tab.id)}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
+          <CaseCodeBlock type={activeInfo.tone} label={activeInfo.codeLabel} text={activeInfo.text} />
         </div>
+      )}
 
-        <div className={`p-case-screen-body${current.image ? ' p-has-image' : ''}${current.imageMode === 'fit' ? ' p-case-screen-fit' : ''}`}>
-          {current.image ? (
-            <img
-              src={current.image}
-              alt={current.alt || project.subtitle}
-              style={{
-                width: current.imageMode === 'fit' || current.imageMode === 'full' ? '100%' : 'auto',
-                maxWidth: '100%',
-                height: 'auto',
-                display: 'block',
-                borderRadius: 0,
-                margin: '0 auto',
-              }}
-            />
-          ) : (
-            <span style={{ position: 'relative', zIndex: 3, fontFamily: C.mono, fontSize: 11, color: C.muted, padding: '8px 14px', border: `1px dashed ${C.line}`, borderRadius: 3, background: C.casePlaceholderBg, backdropFilter: 'blur(4px)', textAlign: 'center', maxWidth: '80%', lineHeight: 1.5 }}>
-              {d.screenPlaceholder}<br />{project.subtitle}
+      {!project.caseArticleHtml && !useBottomScreenshots && (
+        <div style={{ border: `1px solid ${C.line}`, borderRadius: 6, background: C.panel, overflow: 'hidden' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderBottom: `1px solid ${C.line}`, background: C.panel2 }}>
+            <MacDots />
+            <span style={{ fontFamily: C.mono, fontSize: 11, color: C.muted, marginLeft: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              ~/{project.id}.case — {project.subtitle}
             </span>
-          )}
-        </div>
+          </div>
 
-        {total > 1 && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, padding: '12px 14px', borderTop: `1px solid ${C.line}`, background: C.panel2 }}>
-            <button className="p-slider-btn" onClick={() => setSlideIdx(i => (i - 1 + total) % total)} aria-label="prev">
-              <svg width={12} height={12} viewBox="0 0 16 16" fill="none">
-                <path d="M10 3.5L5.5 8l4.5 4.5" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-            <div style={{ display: 'inline-flex', gap: 8, alignItems: 'center' }}>
-              {slides.map((_, i) => (
-                <button key={i} className={`p-slider-dot${i === slideIdx ? ' p-active' : ''}`} onClick={() => setSlideIdx(i)} aria-label={`slide ${i + 1}`} />
-              ))}
+          <div className={`p-case-screen-body${current.image ? ' p-has-image' : ''}${current.imageMode === 'fit' ? ' p-case-screen-fit' : ''}`}>
+            {current.image ? (
+              <img
+                src={withSiteBase(current.image)}
+                alt={current.alt || project.subtitle}
+                style={{
+                  width: current.imageMode === 'fit' || current.imageMode === 'full' ? '100%' : 'auto',
+                  maxWidth: '100%',
+                  height: 'auto',
+                  display: 'block',
+                  borderRadius: 0,
+                  margin: '0 auto',
+                }}
+              />
+            ) : (
+              <span style={{ position: 'relative', zIndex: 3, fontFamily: C.mono, fontSize: 11, color: C.muted, padding: '8px 14px', border: `1px dashed ${C.line}`, borderRadius: 3, background: C.casePlaceholderBg, backdropFilter: 'blur(4px)', textAlign: 'center', maxWidth: '80%', lineHeight: 1.5 }}>
+                {d.screenPlaceholder}<br />{project.subtitle}
+              </span>
+            )}
+          </div>
+
+          {total > 1 && (
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, padding: '12px 14px', borderTop: `1px solid ${C.line}`, background: C.panel2 }}>
+              <button className="p-slider-btn" onClick={() => setSlideIdx(i => (i - 1 + total) % total)} aria-label="prev">
+                <svg width={12} height={12} viewBox="0 0 16 16" fill="none">
+                  <path d="M10 3.5L5.5 8l4.5 4.5" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+              <div style={{ display: 'inline-flex', gap: 8, alignItems: 'center' }}>
+                {slides.map((_, i) => (
+                  <button key={i} className={`p-slider-dot${i === slideIdx ? ' p-active' : ''}`} onClick={() => setSlideIdx(i)} aria-label={`slide ${i + 1}`} />
+                ))}
+              </div>
+              <button className="p-slider-btn" onClick={() => setSlideIdx(i => (i + 1) % total)} aria-label="next">
+                <svg width={12} height={12} viewBox="0 0 16 16" fill="none">
+                  <path d="M6 3.5L10.5 8 6 12.5" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
             </div>
-            <button className="p-slider-btn" onClick={() => setSlideIdx(i => (i + 1) % total)} aria-label="next">
-              <svg width={12} height={12} viewBox="0 0 16 16" fill="none">
-                <path d="M6 3.5L10.5 8 6 12.5" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </button>
-          </div>
-        )}
+          )}
 
-        {current.caption ? (
-          <div style={{ fontFamily: C.mono, fontSize: 12, color: C.muted, lineHeight: 1.65, padding: '12px 16px 14px', background: C.panel2, borderTop: `1px solid ${C.line}` }}>
-            // {current.caption}
-          </div>
-        ) : null}
-      </div>
-
-      <div className="p-case-info-tabs">
-        <div className="p-case-info-tablist" role="tablist" aria-label="case details">
-          {infoTabs.map(tab => (
-            <button
-              key={tab.type}
-              type="button"
-              role="tab"
-              aria-selected={activeInfo.type === tab.type}
-              className={`p-case-info-tab p-case-info-tab-${tab.type}${activeInfo.type === tab.type ? ' p-active' : ''}`}
-              onClick={() => setActiveInfoTab(tab.type)}
-            >
-              {tab.label}
-            </button>
-          ))}
+          {current.caption ? (
+            <div style={{ fontFamily: C.mono, fontSize: 12, color: C.muted, lineHeight: 1.65, padding: '12px 16px 14px', background: C.panel2, borderTop: `1px solid ${C.line}` }}>
+              // {current.caption}
+            </div>
+          ) : null}
         </div>
-        <CaseCodeBlock type={activeInfo.type} label={activeInfo.label} text={activeInfo.text} />
-      </div>
+      )}
+
+      {useBottomScreenshots && project.caseInlineScreenshots ? (
+        <section className="p-case-screens-bottom" aria-label="case screenshots">
+          <div className="p-case-screens-bottom-head">
+            <MacDots />
+            <span style={{ fontFamily: C.mono, fontSize: 11, color: C.muted, marginLeft: 4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              ~/{project.id}.case — {project.subtitle}
+            </span>
+          </div>
+          <CaseInlineScreenshots screenshots={project.caseInlineScreenshots} />
+        </section>
+      ) : null}
     </section>
   );
 }
 
 // ── Main Portfolio component ──────────────────────────────────────────────────
 
-export function Portfolio() {
+export function Portfolio({
+  forcedLang,
+  hideLangSwitcher = false,
+}: {
+  forcedLang?: Lang;
+  hideLangSwitcher?: boolean;
+} = {}) {
   const [lang, setLang] = useState<Lang>(() => {
+    if (forcedLang) return forcedLang;
     try {
       const s = localStorage.getItem('portfolio-lang');
       if (s === 'ru' || s === 'en') return s as Lang;
@@ -836,7 +1254,9 @@ export function Portfolio() {
   const [activeSections, setActiveSections] = useState<string[]>(['readme']);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const mainRef = useRef<HTMLDivElement>(null);
-  const d = DATA[lang];
+  const activeLang = forcedLang || lang;
+  const d = DATA[activeLang];
+  const visibleProjects = d.projects.filter(project => !project.isLoading && !HIDDEN_PROJECT_IDS.has(project.id));
 
   const scrollToSection = useCallback((id: string) => {
     const el = document.getElementById(id);
@@ -872,6 +1292,7 @@ export function Portfolio() {
   }, [scrollToSection]);
 
   const switchLang = (l: Lang) => {
+    if (forcedLang) return;
     setLang(l);
     try { localStorage.setItem('portfolio-lang', l); } catch { /* noop */ }
   };
@@ -981,7 +1402,7 @@ export function Portfolio() {
   return (
     <div className="p-root" style={{ position: 'relative' }}>
       {/* Grid */}
-      <div className="p-grid" style={{ display: 'grid', gridTemplateRows: '36px 1fr 22px', gridTemplateColumns: '260px 1fr', gridTemplateAreas: '"top top" "side main" "status status"', height: '100vh', position: 'relative', zIndex: 1 }}>
+      <div className="p-grid" style={{ display: 'grid', gridTemplateRows: '36px 1fr 22px', gridTemplateColumns: '230px 1fr', gridTemplateAreas: '"top top" "side main" "status status"', height: '100vh', position: 'relative', zIndex: 1 }}>
 
         {/* Top bar */}
         <header style={{ gridArea: 'top', borderBottom: `1px solid ${C.line}`, background: C.panel, display: 'flex', alignItems: 'center', padding: '0 14px', gap: 14, fontSize: 11, color: C.muted, fontFamily: C.mono }}>
@@ -991,15 +1412,17 @@ export function Portfolio() {
             </svg>
           </button>
           <MacDots />
-          <span className="p-header-title" style={{ color: C.ink }}>~/portfolio/<b style={{ color: C.accent2, fontWeight: 500 }}>{currentCase ? `${currentCase}.case` : (cvOpen ? 'anna_demeshko.cv.pdf' : (lang === 'ru' ? 'анна_демешко.fig' : 'anna_demeshko.fig'))}</b></span>
+          <span className="p-header-title" style={{ color: C.ink }}>~/portfolio/<b style={{ color: C.accent2, fontWeight: 500 }}>{currentCase ? `${currentCase}.case` : (cvOpen ? 'anna_demeshko.cv.pdf' : (activeLang === 'ru' ? 'анна_демешко.fig' : 'anna_demeshko.fig'))}</b></span>
           <div style={{ marginLeft: 'auto', display: 'flex', gap: 14, alignItems: 'center' }}>
             <span className="p-header-meta" style={{ opacity: 0.7 }}>{d.ln}</span>
             <span className="p-header-meta" style={{ opacity: 0.7 }}>utf-8</span>
-            <div style={{ display: 'flex', border: `1px solid ${C.line}`, borderRadius: 999, padding: 2, marginLeft: 6 }}>
-              {(['ru', 'en'] as Lang[]).map(l => (
-                <button key={l} className={`p-lang-btn${lang === l ? ' p-active' : ''}`} onClick={() => switchLang(l)}>{l}</button>
-              ))}
-            </div>
+            {!hideLangSwitcher && (
+              <div style={{ display: 'flex', border: `1px solid ${C.line}`, borderRadius: 999, padding: 2, marginLeft: 6 }}>
+                {(['ru', 'en'] as Lang[]).map(l => (
+                  <button key={l} className={`p-lang-btn${activeLang === l ? ' p-active' : ''}`} onClick={() => switchLang(l)}>{l}</button>
+                ))}
+              </div>
+            )}
           </div>
         </header>
 
@@ -1008,7 +1431,7 @@ export function Portfolio() {
         <aside className={`p-sidebar${sidebarOpen ? ' p-sidebar-open' : ''}`} style={{ gridArea: 'side', background: C.panel, borderRight: `1px solid ${C.line}`, overflowY: 'auto', padding: '8px 0 20px' }}>
           {[
             { label: d.folderAbout, items: [{ id: 'readme', icon: '☰', name: 'readme', ext: '.md' }, { id: 'cv', icon: '▣', name: 'cv', ext: '.pdf' }, { id: 'stack', icon: '☰', name: 'stack', ext: '.json' }] },
-            { label: d.folderProjects, items: d.projects.filter(p => !p.isLoading).map(p => ({ id: p.id, icon: '◆', name: p.id.replace(/-/g, '_'), ext: '.case', isProject: true })) },
+            { label: d.folderProjects, items: visibleProjects.map(p => ({ id: p.id, icon: '◆', name: p.id.replace(/-/g, '_'), ext: '.case', isProject: true })) },
             { label: d.folderEtc, items: [{ id: 'contact', icon: '@', name: 'contact', ext: '.md' }, { id: 'vibes', icon: '♪', name: 'now playing', ext: '.mp3' }] },
           ].map(folder => (
             <div key={folder.label} style={{ padding: '10px 10px 4px' }}>
@@ -1026,15 +1449,15 @@ export function Portfolio() {
         <main className="p-main" ref={mainRef} style={{ gridArea: 'main', overflowY: 'auto', scrollBehavior: 'smooth', background: C.bg, minWidth: 0 }}>
 
           {/* Editor */}
-          <div className="p-editor" id="editor" style={{ padding: '24px 40px 48px', maxWidth: 1120, margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: 36 }}>
+          <div className="p-editor" id="editor" style={{ padding: '24px 40px 48px', maxWidth: 1200, margin: '0 auto', width: '100%', display: 'flex', flexDirection: 'column', gap: 36 }}>
             {currentCase && currentProject ? (
               <CaseView project={currentProject} d={d} onBack={closeCase} />
             ) : cvOpen ? (
-              <CvView d={d} lang={lang} onBack={openPortfolio} />
+              <CvView d={d} lang={activeLang} onBack={openPortfolio} />
             ) : (
               <>
-                <ReadmeSection d={d} lang={lang} onOpenCv={openCv} />
-                <ProjectsSection d={d} onOpenCase={openCase} />
+                <ReadmeSection d={d} lang={activeLang} onOpenCv={openCv} />
+                <ProjectsSection d={d} onOpenCase={openCase} lang={activeLang} />
                 <StackSection d={d} />
                 <ContactSection d={d} />
                 <VibesSection d={d} />

@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "build": "vite build",
-    "dev": "vite"
+    "build:en": "VITE_PORTFOLIO_LANG=en VITE_PORTFOLIO_SINGLE_LANG=true vite build --outDir dist-en --base /portfolio-en/",
+    "dev": "vite",
+    "dev:en": "VITE_PORTFOLIO_LANG=en VITE_PORTFOLIO_SINGLE_LANG=true vite --port 5174 --base /portfolio-en/"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
