@@ -2569,7 +2569,7 @@
     gap: 16px !important;
   }
   .p-project-card {
-    height: 540px !important;
+    height: 570px !important;
     min-height: 0 !important;
     border-radius: 6px !important;
   }
@@ -2582,12 +2582,11 @@
   }
   .p-project-card h3 {
     font-size: 17px !important;
-    white-space: normal !important;
+    white-space: pre-line !important;
     overflow: hidden !important;
     text-overflow: clip !important;
-    display: -webkit-box !important;
-    -webkit-box-orient: vertical !important;
-    -webkit-line-clamp: 3 !important;
+    display: block !important;
+    max-height: 3.5em !important;
   }
   .p-project-card-footer {
     align-items: flex-start !important;
