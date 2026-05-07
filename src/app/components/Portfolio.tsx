@@ -259,7 +259,7 @@ const PROJECT_CARD_COPY: Record<Lang, Record<string, { problem: string; action: 
 
 const PROJECT_CARD_TITLES: Record<Lang, Record<string, string>> = {
   ru: {
-    copilot: 'Copilot — Анализ Репозиториев И Workflow Решений',
+    copilot: 'CoPilot — анализ и решения по уязвимостям',
     dashboards: 'Дашборды Для Аналитики ИБ',
     'wave-copilot': 'Wave — AI-Анализ Уязвимостей',
     design_system: 'Развитие Дизайн-Системы',
