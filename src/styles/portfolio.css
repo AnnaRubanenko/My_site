@@ -1341,10 +1341,10 @@
 
 .p-cv-education-head {
   display: flex;
-  align-items: flex-end;
-  gap: 12px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3px;
   min-width: 0;
-  flex-wrap: nowrap;
 }
 
 .p-cv-education h4 {
@@ -1363,9 +1363,7 @@
   color: var(--p-muted);
   font-family: var(--p-mono);
   font-size: 11px;
-  line-height: 1.1;
-  flex: 0 0 auto;
-  white-space: nowrap;
+  line-height: 1.3;
 }
 
 .p-cv-education span {
