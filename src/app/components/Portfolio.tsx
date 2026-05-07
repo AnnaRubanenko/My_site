@@ -1116,7 +1116,7 @@ function CaseView({ project, d, onBack }: { project: Project; d: LangData; onBac
     <section id="case" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <button className="p-case-back" onClick={onBack}>← {d.caseBackLabel}</button>
 
-      <h1 style={{ fontFamily: C.sans, fontSize: 'clamp(30px, 4.4vw, 42px)', fontWeight: 500, letterSpacing: '-0.02em', lineHeight: 1.08, margin: 0, color: C.ink }}>
+      <h1 style={{ fontFamily: C.sans, fontSize: 'clamp(30px, 4.4vw, 42px)', fontWeight: 500, letterSpacing: '-0.02em', lineHeight: 1.08, margin: 0, color: C.ink, whiteSpace: 'pre-line' }}>
         {project.title}
         <span style={{ color: C.dim, fontWeight: 300, fontSize: '0.55em', fontFamily: C.mono, letterSpacing: 0, marginLeft: 6, verticalAlign: 'middle', opacity: 0.7 }}>.case</span>
       </h1>

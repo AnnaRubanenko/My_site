@@ -171,11 +171,11 @@ export const DATA: Record<Lang, LangData> = {
     lede: 'превращаю сложные процессы в понятные, удобные и красивые продукты, crm системы — моя страсть\n\nлюблю свою работу, музыку Оззи Осборна и философию Мишеля Монтеня',
     stats: {
       'запущено проектов': '7',
-      'кейсов': '6',
+      'кейсов': '4',
       'опыт работы': '3+ года',
       'домены': 'enterprise / saas / b2b / b2c',
-      'формат работы': 'full-time',
-      'локация': 'remote, gmt+3',
+      'формат работы': 'полная занятость',
+      'локация': 'удалённо, gmt+3',
       'языки': 'ru · en',
     },
     secMarker: '# readme.md · обновлено 19.04.2026',
@@ -185,7 +185,7 @@ export const DATA: Record<Lang, LangData> = {
       'проектирую сценарии, в которых удобно работать каждый день',
       'люблю дизайн, который приносит реальную пользу продукту',
     ],
-    codeTodayLabel: 'today',
+    codeTodayLabel: 'сейчас',
     codeToday: 'делаю редизайны для души, изучаю нейросети',
     codeComment: '// в чём сильна',
     ctaTelegram: 'написать в телеграм',
@@ -342,7 +342,7 @@ export const DATA: Record<Lang, LangData> = {
     projects: [
       {
         id: 'copilot',
-        title: 'CoPilot — анализ репозиториев и решения по уязвимостям',
+        title: 'CoPilot —\nАнализ репозиториев и решения по уязвимостям',
         subtitle: 'корпоративная безопасность · триаж уязвимостей',
         year: '2025',
         tags: ['appsec', 'b2b', 'enterprise'],
@@ -800,7 +800,7 @@ export const DATA: Record<Lang, LangData> = {
     lede: 'I design B2B products for security and operational teams — turning complex workflows into clear UI and decisions that ship.\n\n3+ years in AppSec platforms, dashboards, forms, and design systems.\n\nI love my work, Ozzy Osbourne\'s music, and the philosophy of Michel de Montaigne.',
     stats: {
       'projects shipped': '7',
-      'case studies': '6',
+      'case studies': '4',
       'experience': '3+ years',
       domains: 'b2b saas / appsec / enterprise',
       'open to': 'remote full-time',
@@ -972,7 +972,7 @@ export const DATA: Record<Lang, LangData> = {
     projects: [
       {
         id: 'copilot',
-        title: 'CoPilot Reports — AppSec Scan Results Workspace',
+        title: 'CoPilot Reports —\nAppSec Scan Results Workspace',
         subtitle: 'standalone web app · enterprise AppSec ecosystem',
         year: '2025',
         tags: ['appsec', 'b2b', 'enterprise'],
