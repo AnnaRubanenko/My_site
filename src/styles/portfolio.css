@@ -1114,6 +1114,7 @@
   font-family: var(--p-sans);
   font-size: 16px;
   line-height: 1.58;
+  white-space: pre-line;
 }
 
 .p-cv-availability {
