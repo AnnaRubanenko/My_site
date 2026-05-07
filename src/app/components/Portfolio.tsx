@@ -859,7 +859,7 @@ function CaseCodeBlock({ type, label, text }: { type: keyof typeof BLOCK_COLORS;
   const contentLines = text.split('\n');
 
   return (
-    <div style={{
+    <div className="p-case-code-block" style={{
       background: C.panel, border: `1px solid ${C.line}`, borderLeft: `3px solid ${bc.border}`,
       borderRadius: 6, padding: '12px 14px 12px 6px', fontFamily: C.mono, fontSize: 12.5, lineHeight: 1.75, color: C.ink, overflowX: 'auto',
     }}>

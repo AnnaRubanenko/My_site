@@ -1701,6 +1701,11 @@
   --tab-accent: var(--p-accent2);
 }
 
+.p-case-info-tabs-copilot .p-case-code-block,
+.p-case-info-tabs-wave-copilot .p-case-code-block {
+  border-left-color: var(--p-accent2) !important;
+}
+
 .p-case-info-tab:last-child {
   border-right: 0;
 }
