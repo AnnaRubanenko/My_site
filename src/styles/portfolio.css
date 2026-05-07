@@ -1680,31 +1680,21 @@
   transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
 
-.p-case-info-tab-task { --tab-accent: #4b3bff; }
-.p-case-info-tab-teamRole { --tab-accent: #1db954; }
-.p-case-info-tab-problem { --tab-accent: #ff5f57; }
-.p-case-info-tab-process { --tab-accent: #ff8a4c; }
-.p-case-info-tab-solution { --tab-accent: var(--p-accent2); }
-.p-case-info-tab-overview { --tab-accent: #4b3bff; }
+.p-case-info-tab-task { --tab-accent: #a798ff; }
+.p-case-info-tab-teamRole { --tab-accent: #72e69a; }
+.p-case-info-tab-problem { --tab-accent: #ffb0b0; }
+.p-case-info-tab-process { --tab-accent: #ffb36f; }
+.p-case-info-tab-solution { --tab-accent: #d4fb3c; }
+.p-case-info-tab-overview { --tab-accent: #a798ff; }
 .p-case-info-tab-goals { --tab-accent: #d4fb3c; }
-.p-case-info-tab-role { --tab-accent: #1db954; }
-.p-case-info-tab-discovery { --tab-accent: #ff8a4c; }
-.p-case-info-tab-strategy { --tab-accent: #4b7dff; }
-.p-case-info-tab-why { --tab-accent: #25d0c8; }
-.p-case-info-tab-ux { --tab-accent: #ffcc66; }
-.p-case-info-tab-system { --tab-accent: #b7a8ff; }
-.p-case-info-tab-tradeoffs { --tab-accent: #ff6fb1; }
-.p-case-info-tab-outcome { --tab-accent: #66e080; }
-
-.p-case-info-tabs-copilot .p-case-info-tab,
-.p-case-info-tabs-wave-copilot .p-case-info-tab {
-  --tab-accent: var(--p-accent2);
-}
-
-.p-case-info-tabs-copilot .p-case-code-block,
-.p-case-info-tabs-wave-copilot .p-case-code-block {
-  border-left-color: var(--p-accent2) !important;
-}
+.p-case-info-tab-role { --tab-accent: #72e69a; }
+.p-case-info-tab-discovery { --tab-accent: #ffb36f; }
+.p-case-info-tab-strategy { --tab-accent: #8fb0ff; }
+.p-case-info-tab-why { --tab-accent: #78eee8; }
+.p-case-info-tab-ux { --tab-accent: #ffd98c; }
+.p-case-info-tab-system { --tab-accent: #c9bdff; }
+.p-case-info-tab-tradeoffs { --tab-accent: #ffa3ca; }
+.p-case-info-tab-outcome { --tab-accent: #98f2aa; }
 
 .p-case-info-tab:last-child {
   border-right: 0;
