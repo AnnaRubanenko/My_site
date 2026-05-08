@@ -35,7 +35,8 @@ export interface Project {
   problem: string;
   role: string;
   cover: string;
-  slides?: { cover?: string; image?: string; alt?: string; caption?: string; imageMode?: 'default' | 'fit' | 'full' }[];
+  slides?: { cover?: string; image?: string; embed?: string; alt?: string; caption?: string; imageMode?: 'default' | 'fit' | 'full' }[];
+  cardSlides?: { cover?: string; image?: string; embed?: string; alt?: string; caption?: string; imageMode?: 'default' | 'fit' | 'full' }[];
   caption?: string;
   task: string;
   teamRole?: string;
@@ -90,6 +91,8 @@ export interface LangData {
   ctaViewCv: string;
   secProjectsTitle: string;
   secProjectsMeta: string;
+  secConceptsTitle: string;
+  secConceptsMeta: string;
   secCvTitle: string;
   secCvMeta: string;
   secStackTitle: string;
@@ -107,6 +110,7 @@ export interface LangData {
   vibesArtworkAlt: string;
   folderAbout: string;
   folderProjects: string;
+  folderConcepts: string;
   folderEtc: string;
   statReady: string;
   ln: string;
@@ -156,6 +160,7 @@ export interface LangData {
   contacts: { label: string; value: string; href: string }[];
   tracks: { title: string; artworkSrc: string; artworkAlt: string }[];
   projects: Project[];
+  concepts: Project[];
 }
 
 
@@ -192,6 +197,8 @@ export const DATA: Record<Lang, LangData> = {
     ctaViewCv: 'смотреть CV',
     secProjectsTitle: 'projects/study_case',
     secProjectsMeta: 'исследования / синки / макеты / тесты => довольные пользователи',
+    secConceptsTitle: 'concepts',
+    secConceptsMeta: 'быстрые продуктовые гипотезы / визуальные направления / прототипы',
     secCvTitle: 'cv',
     secCvMeta: 'короткая версия для рекрутера',
     secStackTitle: 'stack',
@@ -209,6 +216,7 @@ export const DATA: Record<Lang, LangData> = {
     vibesArtworkAlt: 'Обложка альбома No More Tears — Ozzy Osbourne',
     folderAbout: 'about',
     folderProjects: 'projects/study_case/',
+    folderConcepts: 'concepts/',
     folderEtc: 'etc/',
     statReady: 'open to work',
     ln: 'стр 1, кол 1',
@@ -796,6 +804,95 @@ export const DATA: Record<Lang, LangData> = {
         solution: '',
       },
     ],
+    concepts: [
+      {
+        id: 'lumen-fintech',
+        title: 'Lumen — ИИ-финтех для личных финансов',
+        subtitle: 'финтех-концепт · мобильное приложение',
+        year: '2026',
+        tags: ['fintech', 'ai', 'mobile', 'concept'],
+        metric: { value: '', label: '' },
+        problem: 'концепт исследует, как ИИ может работать в личных финансах: не как чат поверх банка, а как ассистент, который помогает понимать деньги, риски и следующие шаги.',
+        role: 'product designer',
+        cover: 'mobile',
+        cardSlides: [
+          {
+            image: '/portfolio/Fin%20tech/lumen-card-preview.png',
+            cover: 'mobile',
+            alt: 'Lumen — AI fintech concept preview',
+            caption: 'превью концепта Lumen',
+          },
+        ],
+        slides: [
+          {
+            embed: '/portfolio/Fin%20tech/Lumen%20-%20AI%20fintech%20case.html',
+            cover: 'mobile',
+            alt: 'Lumen — AI fintech case',
+          },
+        ],
+        task: 'собрать <em>продуктовый концепт AI-first финтех-приложения</em>, где управление деньгами ощущается не как набор банковских разделов, а как понятный личный финансовый помощник.',
+        teamRole: 'формат: <em>личный концепт</em>.\n\nмоя роль: сформулировала продуктовую идею, структуру сценариев, визуальное направление, ключевые экраны, логику персональных подсказок и интерфейсные паттерны для мобильного опыта.',
+        problemFull: 'это не кейс про исправление существующей проблемы в продукте, а концепт на тему внедрения ИИ в личные финансовые ассистенты. я исследовала, как AI может быть встроен в ежедневные финансовые сценарии: объяснять контекст, замечать изменения, подсказывать варианты действий и при этом оставлять контроль за пользователем.',
+        process: 'я разложила концепт на несколько основных сценариев: ежедневный обзор денег, аналитика расходов, платежи и переводы, инвестиции, персонализация и ИИ-подсказки. затем собрала визуальную систему вокруг спокойной премиальной подачи: крупные финансовые сигналы, понятные карточки, мягкая иерархия, быстрые действия и фокус на следующем шаге.\n\nглавный компромисс: не превратить ИИ в декоративный слой. подсказки должны быть частью сценария и помогать принимать решения, но не забирать у пользователя контроль над деньгами.',
+        solution: '<em>спроектировала концепт мобильного финтех-приложения Lumen</em>: главный экран с обзором состояния денег, быстрые действия, аналитика, платежи, инвестиции и персональные подсказки собраны в единую систему.\n\nрезультат:\n<em>5 ключевых экранов продукта</em>\n<em>понятная модель AI-first финансового помощника</em>\n<em>мобильный интерфейс с акцентом на решения, а не только на данные</em>',
+        caseTabs: [
+          {
+            id: 'overview',
+            label: 'обзор',
+            codeLabel: 'обзор',
+            tone: 'overview',
+            text: `Lumen — концепт ИИ-финтеха для личных финансов
+
+   >> Спроектировала мобильный концепт о том, как ИИ может стать личным финансовым ассистентом.
+   >> Основной фокус: ежедневный обзор денег, быстрые действия, аналитика, инвестиции и персональные AI-подсказки.`,
+          },
+          {
+            id: 'problem',
+            label: 'исследование',
+            codeLabel: 'исследование',
+            tone: 'problem',
+            text: `Исследование концепта: как ИИ в личных финансах может работать не отдельным чатом, а контекстным ассистентом внутри ключевых сценариев.
+
+   >> Он должен объяснять, что происходит с деньгами, целями и рисками.
+   >> Подсказки должны появляться там, где пользователь принимает решение.
+   >> Ассистент помогает выбрать следующий шаг, но не забирает контроль.`,
+          },
+          {
+            id: 'goals',
+            label: 'цели',
+            codeLabel: 'цели',
+            tone: 'goals',
+            text: `   >> Сделать главный экран точкой ежедневного финансового обзора.
+   >> Сместить акцент с "посмотреть данные" на "понять состояние и следующий шаг".
+   >> Показать, как ИИ-подсказки могут быть полезными без потери контроля.
+   >> Собрать визуальное направление для спокойного, современного финтех-продукта.`,
+          },
+          {
+            id: 'flow',
+            label: 'сценарий',
+            codeLabel: 'сценарий',
+            tone: 'strategy',
+            text: `return {
+   >> <em>главная:</em> быстрый обзор баланса, движения денег и важного сигнала,
+   >> <em>аналитика:</em> динамика расходов и понятные подсказки,
+   >> <em>платежи:</em> частые действия ближе к пользователю,
+   >> <em>инвестиции:</em> портфель, риск и следующий шаг в одном контексте,
+   >> <em>персонализация:</em> настройки помогают адаптировать продукт под привычки
+}`,
+          },
+          {
+            id: 'outcome',
+            label: 'результат',
+            codeLabel: 'результат',
+            tone: 'outcome',
+            text: `   >> <em>5 экранов концепта:</em> главная, аналитика, платежи, инвестиции и настройки.
+   >> <em>Цельная продуктовая гипотеза:</em> ИИ как личный финансовый ассистент внутри ежедневных сценариев.
+   >> <em>Готовое визуальное направление:</em> мобильный интерфейс можно развивать в интерактивный прототип или продуктовую презентацию.`,
+          },
+        ],
+        caseInlineScreenshots: [],
+      },
+    ],
   },
   en: {
     name: 'Anna Demeshko',
@@ -829,6 +926,8 @@ export const DATA: Record<Lang, LangData> = {
     ctaViewCv: 'view CV',
     secProjectsTitle: 'projects/study_case',
     secProjectsMeta: 'selected work with measurable product impact',
+    secConceptsTitle: 'concepts',
+    secConceptsMeta: 'product hypotheses / visual directions / prototypes',
     secCvTitle: 'cv',
     secCvMeta: 'recruiter-friendly version',
     secStackTitle: 'stack',
@@ -846,6 +945,7 @@ export const DATA: Record<Lang, LangData> = {
     vibesArtworkAlt: 'No More Tears album cover by Ozzy Osbourne',
     folderAbout: 'about',
     folderProjects: 'projects/study_case/',
+    folderConcepts: 'concepts/',
     folderEtc: 'etc/',
     statReady: 'open to work',
     ln: 'ln 1, col 1',
@@ -1693,6 +1793,95 @@ designChoices: {
         task: '',
         problemFull: '',
         solution: '',
+      },
+    ],
+    concepts: [
+      {
+        id: 'lumen-fintech',
+        title: 'Lumen — AI-native finance concept',
+        subtitle: 'fintech concept · mobile app',
+        year: '2026',
+        tags: ['fintech', 'ai', 'mobile', 'concept'],
+        metric: { value: '', label: '' },
+        problem: 'the concept explores how AI can work in personal finance: not as a chat layer on top of banking, but as an assistant for money context, risk, and next steps.',
+        role: 'product designer',
+        cover: 'mobile',
+        cardSlides: [
+          {
+            image: '/portfolio/Fin%20tech/lumen-card-preview.png',
+            cover: 'mobile',
+            alt: 'Lumen — AI fintech concept preview',
+            caption: 'Lumen concept preview',
+          },
+        ],
+        slides: [
+          {
+            embed: '/portfolio/Fin%20tech/Lumen%20-%20AI%20fintech%20case.html',
+            cover: 'mobile',
+            alt: 'Lumen — AI fintech case',
+          },
+        ],
+        task: 'create a <em>product concept for an AI-first finance app</em> where money management feels like a personal financial assistant, not a set of banking sections.',
+        teamRole: 'format: <em>personal concept</em>.\n\nmy role: defined the product idea, core user flows, visual direction, key screens, personal insight logic, and mobile interface patterns.',
+        problemFull: 'this is not a case about fixing an existing product problem; it is a concept exploring how AI could be embedded into personal finance assistants. I looked at how AI can support daily money decisions: explaining context, noticing changes, suggesting possible actions, and still keeping the user in control.',
+        process: 'i mapped the concept around several core flows: daily financial overview, spending analytics, payments and transfers, investments, personalization, and AI-powered guidance. then i built the visual direction around calm premium utility: large financial signals, readable cards, soft hierarchy, quick actions, and a focus on the next step.\n\nkey trade-off: avoid making AI a decorative layer. recommendations should be part of the user flow and support decisions without taking financial control away from the user.',
+        solution: '<em>designed the Lumen mobile finance concept</em>: account overview, quick actions, analytics, payments, investments, and personal insights work as one product system.\n\nimpact:\n<em>5 key product screens</em>\n<em>a clear AI-first finance assistant model</em>\n<em>a mobile interface focused on decisions, not just data</em>',
+        caseTabs: [
+          {
+            id: 'overview',
+            label: 'overview',
+            codeLabel: 'overview',
+            tone: 'overview',
+            text: `Lumen — AI-native finance concept
+
+   >> Designed a mobile concept for how AI could become a personal finance assistant.
+   >> The concept focuses on daily financial overview, quick actions, analytics, investments, and personal AI guidance.`,
+          },
+          {
+            id: 'problem',
+            label: 'research',
+            codeLabel: 'research',
+            tone: 'problem',
+            text: `Concept research: how AI in personal finance can work not as a separate chat surface, but as a contextual assistant inside key user flows.
+
+   >> It should explain what is happening with money, goals, and risk.
+   >> Guidance should appear where the user is making a decision.
+   >> The assistant helps choose a next step without taking control away.`,
+          },
+          {
+            id: 'goals',
+            label: 'goals',
+            codeLabel: 'goals',
+            tone: 'goals',
+            text: `   >> Make the home screen a daily financial overview.
+   >> Shift the product from "look at data" to "understand state and next step".
+   >> Show how AI guidance can be useful while users stay in control.
+   >> Define a calm, modern visual direction for a mobile fintech product.`,
+          },
+          {
+            id: 'flow',
+            label: 'flow',
+            codeLabel: 'flow',
+            tone: 'strategy',
+            text: `return {
+   >> <em>home:</em> balance, money movement, and the key signal of the day,
+   >> <em>analytics:</em> spending dynamics with useful context,
+   >> <em>payments:</em> frequent actions brought closer to the user,
+   >> <em>investments:</em> portfolio, risk, and next step in one context,
+   >> <em>personalization:</em> settings adapt the product to user habits
+}`,
+          },
+          {
+            id: 'outcome',
+            label: 'outcome',
+            codeLabel: 'outcome',
+            tone: 'outcome',
+            text: `   >> <em>5 concept screens:</em> home, analytics, payments, investments, and settings.
+   >> <em>Clear product hypothesis:</em> AI as a personal finance assistant inside daily money flows.
+   >> <em>Ready visual direction:</em> the concept can be expanded into an interactive prototype or product pitch.`,
+          },
+        ],
+        caseInlineScreenshots: [],
       },
     ],
   },
