@@ -85,8 +85,11 @@ function App() {
 
   // ── Mobile layout ───────────────────────────────────────────
   if (isMobile && !isCardPreview) {
-    const phoneW = Math.min(window.innerWidth - 40, 390);
-    const phoneH = Math.round(phoneW * (844 / 390));
+    const phoneW = 390;
+    const phoneH = 844;
+    const scale = Math.min((window.innerWidth - 32) / phoneW, 1);
+    const scaledW = Math.round(phoneW * scale);
+    const scaledH = Math.round(phoneH * scale);
 
     return (
       <div style={{
@@ -144,9 +147,11 @@ function App() {
                 fontSize: 10, fontFamily: L.mono, letterSpacing: 2,
                 textTransform: 'uppercase', color: L.textDim, marginBottom: 14,
               }}>{s.label}</div>
-              <Phone screenLabel={s.label} width={phoneW} height={phoneH}>
-                {s.comp}
-              </Phone>
+              <div style={{ width: scaledW, height: scaledH, overflow: 'hidden', flexShrink: 0 }}>
+                <div style={{ transform: `scale(${scale})`, transformOrigin: 'top left', width: phoneW, height: phoneH }}>
+                  <Phone screenLabel={s.label}>{s.comp}</Phone>
+                </div>
+              </div>
             </div>
           ))}
         </div>
