@@ -236,6 +236,10 @@ const PROJECT_CARD_COPY: Record<Lang, Record<string, { problem: string; action: 
       problem: 'Повторяющиеся UI-паттерны жили отдельно и по-разному трактовались дизайном и разработкой.',
       action: 'Описала 6 компонентов дизайн-системы: структура, состояния, правила и handoff.',
     },
+    'lumen-fintech': {
+      problem: 'Исследовала, как ИИ может стать личным финансовым ассистентом, а не просто чат-слоем в банке.',
+      action: 'Собрала AI-first концепт: обзор денег, подсказки, платежи, инвестиции и персональные сценарии.',
+    },
   },
   en: {
     copilot: {
@@ -254,6 +258,10 @@ const PROJECT_CARD_COPY: Record<Lang, Record<string, { problem: string; action: 
       problem: 'Recurring UI patterns were interpreted differently across design and engineering.',
       action: 'Documented 6 system components: anatomy, states, rules, and handoff guidance.',
     },
+    'lumen-fintech': {
+      problem: 'Explored how AI can work as a personal finance assistant, not just a chat layer inside banking.',
+      action: 'Built an AI-first concept with money overview, guidance, payments, investments, and personal flows.',
+    },
   },
 };
 
@@ -263,12 +271,14 @@ const PROJECT_CARD_TITLES: Record<Lang, Record<string, string>> = {
     dashboards: 'Дашборды Для Аналитики ИБ',
     'wave-copilot': 'Wave — AI-Анализ Уязвимостей',
     design_system: 'Развитие Дизайн-Системы',
+    'lumen-fintech': 'Lumen — ИИ-Финтех Для Личных Финансов',
   },
   en: {
     copilot: 'CoPilot Reports — AppSec Scan Results Workspace',
     dashboards: 'Dashboards For Security Analytics',
     'wave-copilot': 'Wave — In-Context AI Vulnerability Analysis',
     design_system: 'Design System Evolution',
+    'lumen-fintech': 'Lumen — AI-Native Finance Concept',
   },
 };
 
@@ -302,10 +312,14 @@ function ProjectCard({
 }) {
   const [hovered, setHovered] = useState(false);
   const [slideIdx, setSlideIdx] = useState(0);
-  const slides = (p.slides || []).filter(slide => slide.image);
+  const slides = (p.cardSlides || p.slides || []).filter(slide => slide.image || slide.embed);
   const activeSlide = slides[slideIdx % Math.max(slides.length, 1)];
   const copy = projectCardCopy(p, lang);
   const title = projectCardTitle(p, lang);
+  const tags = p.tags.map(tag => tag.trim()).filter(Boolean).slice(0, 4);
+  const metricValue = p.metric.value.trim();
+  const metricLabel = p.metric.label.trim();
+  const hasMetric = p.id !== 'lumen-fintech' && Boolean(metricValue || metricLabel);
 
   if (p.isLoading) {
     return (
@@ -334,6 +348,13 @@ function ProjectCard({
       <div className="p-project-card-media">
         {activeSlide?.image ? (
           <img src={withSiteBase(activeSlide.image)} alt={activeSlide.alt || p.subtitle} />
+        ) : activeSlide?.embed ? (
+          <iframe
+            src={withSiteBase(activeSlide.embed)}
+            title={activeSlide.alt || p.subtitle}
+            className="p-project-card-embed"
+            tabIndex={-1}
+          />
         ) : (
           <div className="p-project-card-media-placeholder">
             <span>{p.subtitle}</span>
@@ -376,17 +397,27 @@ function ProjectCard({
         </div>
       </div>
 
-      <div className="p-project-card-footer">
-        <div className="p-project-card-tags">
-          {p.tags.map(t => (
+      {p.id === 'lumen-fintech' ? (
+        <div className="p-lumen-card-tags" aria-label="concept tags">
+          {tags.map(t => (
             <span key={t}>{t}</span>
           ))}
         </div>
-        <div className="p-project-card-metric">
-          <span>{p.metric.value}</span>
-          <span>{p.metric.label}</span>
+      ) : (
+        <div className="p-project-card-footer">
+          <div className="p-project-card-tags">
+            {tags.map(t => (
+              <span key={t}>{t}</span>
+            ))}
+          </div>
+          {hasMetric ? (
+            <div className="p-project-card-metric">
+              {metricValue ? <span>{metricValue}</span> : null}
+              {metricLabel ? <span>{metricLabel}</span> : null}
+            </div>
+          ) : null}
         </div>
-      </div>
+      )}
     </article>
   );
 }
@@ -421,6 +452,32 @@ function ProjectsSection({ d, onOpenCase, lang }: { d: LangData; onOpenCase: (id
           <span>{project.title}</span>
         </div>
       ))}
+    </section>
+  );
+}
+
+function ConceptsSection({ d, onOpenCase, lang }: { d: LangData; onOpenCase: (id: string) => void; lang: Lang }) {
+  const ctaLabel = lang === 'ru' ? 'просмотреть концепт' : 'view concept';
+  const problemLabel = lang === 'ru' ? 'исследование:' : 'research:';
+  const actionLabel = lang === 'ru' ? 'что я сделала:' : 'what i did:';
+
+  return (
+    <section id="concepts" style={{ scrollMarginTop: 60 }}>
+      <SectionHead title={d.secConceptsTitle} ext="/" meta={d.secConceptsMeta} />
+      <div className="p-project-card-grid p-concepts-card-grid">
+        {d.concepts.map((p, i) => (
+          <ProjectCard
+            key={p.id}
+            p={p}
+            idx={i}
+            onOpenCase={onOpenCase}
+            ctaLabel={ctaLabel}
+            problemLabel={problemLabel}
+            actionLabel={actionLabel}
+            lang={lang}
+          />
+        ))}
+      </div>
     </section>
   );
 }
@@ -1083,6 +1140,7 @@ function CaseArticle({
 function CaseView({ project, d, onBack }: { project: Project; d: LangData; onBack: () => void }) {
   const [slideIdx, setSlideIdx] = useState(0);
   const [activeInfoTab, setActiveInfoTab] = useState('task');
+  const [embedHeights, setEmbedHeights] = useState<Record<string, number>>({});
   const slides = (project.slides && project.slides.length)
     ? project.slides
     : [{ cover: project.cover, caption: project.caption || project.subtitle }];
@@ -1112,6 +1170,31 @@ function CaseView({ project, d, onBack }: { project: Project; d: LangData; onBac
     setSlideIdx(0);
   }, [project.id]);
 
+  const syncEmbedHeight = useCallback((embedSrc: string, frame: HTMLIFrameElement) => {
+    const measure = () => {
+      try {
+        const doc = frame.contentDocument;
+        if (!doc) return;
+        const body = doc.body;
+        const root = doc.documentElement;
+        const nextHeight = Math.max(
+          body?.scrollHeight || 0,
+          body?.offsetHeight || 0,
+          root?.scrollHeight || 0,
+          root?.offsetHeight || 0,
+          520,
+        );
+        setEmbedHeights(prev => (
+          prev[embedSrc] === nextHeight ? prev : { ...prev, [embedSrc]: nextHeight }
+        ));
+      } catch {
+        // Cross-origin frames keep the default responsive height.
+      }
+    };
+
+    [0, 250, 900, 1800].forEach(delay => window.setTimeout(measure, delay));
+  }, []);
+
   return (
     <section id="case" style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <button className="p-case-back" onClick={onBack}>← {d.caseBackLabel}</button>
@@ -1127,10 +1210,12 @@ function CaseView({ project, d, onBack }: { project: Project; d: LangData; onBac
             <span key={t} style={{ fontFamily: C.mono, fontSize: 13, padding: '5px 14px', border: `1px solid ${C.line}`, borderRadius: 999, color: C.accent2, background: C.tagBg, textTransform: 'lowercase' }}>{t}</span>
           ))}
         </div>
-        <div className="p-case-metric">
-          <span>{project.metric.value}</span>
-          <span>{project.metric.label}</span>
-        </div>
+        {(project.metric.value || project.metric.label) && (
+          <div className="p-case-metric">
+            <span>{project.metric.value}</span>
+            <span>{project.metric.label}</span>
+          </div>
+        )}
       </div>
 
       {project.caseArticleHtml ? (
@@ -1168,7 +1253,7 @@ function CaseView({ project, d, onBack }: { project: Project; d: LangData; onBac
             </span>
           </div>
 
-          <div className={`p-case-screen-body${current.image ? ' p-has-image' : ''}${current.imageMode === 'fit' ? ' p-case-screen-fit' : ''}`}>
+          <div className={`p-case-screen-body${current.image || current.embed ? ' p-has-image' : ''}${current.embed ? ' p-has-embed' : ''}${current.imageMode === 'fit' ? ' p-case-screen-fit' : ''}`}>
             {current.image ? (
               <img
                 src={withSiteBase(current.image)}
@@ -1181,6 +1266,14 @@ function CaseView({ project, d, onBack }: { project: Project; d: LangData; onBac
                   borderRadius: 0,
                   margin: '0 auto',
                 }}
+              />
+            ) : current.embed ? (
+              <iframe
+                src={withSiteBase(current.embed)}
+                title={current.alt || project.subtitle}
+                className="p-case-screen-embed"
+                style={{ height: embedHeights[current.embed] ? `${embedHeights[current.embed]}px` : undefined }}
+                onLoad={event => syncEmbedHeight(current.embed!, event.currentTarget)}
               />
             ) : (
               <span style={{ position: 'relative', zIndex: 3, fontFamily: C.mono, fontSize: 11, color: C.muted, padding: '8px 14px', border: `1px dashed ${C.line}`, borderRadius: 3, background: C.casePlaceholderBg, backdropFilter: 'blur(4px)', textAlign: 'center', maxWidth: '80%', lineHeight: 1.5 }}>
@@ -1257,6 +1350,7 @@ export function Portfolio({
   const activeLang = forcedLang || lang;
   const d = DATA[activeLang];
   const visibleProjects = d.projects.filter(project => !project.isLoading && !HIDDEN_PROJECT_IDS.has(project.id));
+  const visibleConcepts = d.concepts;
 
   const scrollToSection = useCallback((id: string) => {
     const el = document.getElementById(id);
@@ -1358,7 +1452,7 @@ export function Portfolio({
     return () => main.removeEventListener('scroll', onScroll);
   }, [currentCase, cvOpen]);
 
-  const currentProject = currentCase ? d.projects.find(p => p.id === currentCase) : null;
+  const currentProject = currentCase ? [...d.projects, ...d.concepts].find(p => p.id === currentCase) : null;
 
   // Sidebar tree item
   function TreeItem({ id, icon, name, ext, isProject = false, href }: { id: string; icon: string; name: string; ext: string; isProject?: boolean; href?: string }) {
@@ -1432,6 +1526,7 @@ export function Portfolio({
           {[
             { label: d.folderAbout, items: [{ id: 'readme', icon: '☰', name: 'readme', ext: '.md' }, { id: 'cv', icon: '▣', name: 'cv', ext: '.pdf' }, { id: 'stack', icon: '☰', name: 'stack', ext: '.json' }] },
             { label: d.folderProjects, items: visibleProjects.map(p => ({ id: p.id, icon: '◆', name: p.id.replace(/-/g, '_'), ext: '.case', isProject: true })) },
+            { label: d.folderConcepts, items: visibleConcepts.map(p => ({ id: p.id, icon: '◇', name: p.id.replace(/-/g, '_'), ext: '.case', isProject: true })) },
             { label: d.folderEtc, items: [{ id: 'contact', icon: '@', name: 'contact', ext: '.md' }, { id: 'vibes', icon: '♪', name: 'now playing', ext: '.mp3' }] },
           ].map(folder => (
             <div key={folder.label} style={{ padding: '10px 10px 4px' }}>
@@ -1458,6 +1553,7 @@ export function Portfolio({
               <>
                 <ReadmeSection d={d} lang={activeLang} onOpenCv={openCv} />
                 <ProjectsSection d={d} onOpenCase={openCase} lang={activeLang} />
+                <ConceptsSection d={d} onOpenCase={openCase} lang={activeLang} />
                 <StackSection d={d} />
                 <ContactSection d={d} />
                 <VibesSection d={d} />
