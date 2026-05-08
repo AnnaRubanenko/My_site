@@ -49,6 +49,29 @@ function AutoScrollScreens() {
 
 function App() {
   const isCardPreview = new URLSearchParams(window.location.search).get('preview') === 'card';
+
+  const [isMobile, setIsMobile] = React.useState(() => window.innerWidth < 640);
+  const [activeIndex, setActiveIndex] = React.useState(0);
+  const trackRef = React.useRef(null);
+
+  React.useEffect(() => {
+    const mq = window.matchMedia('(max-width: 639px)');
+    const handler = e => setIsMobile(e.matches);
+    mq.addEventListener('change', handler);
+    return () => mq.removeEventListener('change', handler);
+  }, []);
+
+  React.useEffect(() => {
+    const track = trackRef.current;
+    if (!track) return;
+    const onScroll = () => {
+      const idx = Math.round(track.scrollLeft / track.clientWidth);
+      setActiveIndex(idx);
+    };
+    track.addEventListener('scroll', onScroll, { passive: true });
+    return () => track.removeEventListener('scroll', onScroll);
+  }, [isMobile]);
+
   const screens = [
     { id: 'dashboard', label: '01 · Home',         comp: <ScreenDashboard/> },
     { id: 'wallet',    label: '02 · Wallet',       comp: <ScreenWallet/> },
@@ -60,6 +83,99 @@ function App() {
   ];
   const visibleScreens = isCardPreview ? screens.slice(0, 2) : screens;
 
+  // ── Mobile layout ───────────────────────────────────────────
+  if (isMobile && !isCardPreview) {
+    const phoneW = Math.min(window.innerWidth - 40, 390);
+    const phoneH = Math.round(phoneW * (844 / 390));
+
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: 'radial-gradient(120% 80% at 0% 0%, #1b1830 0%, #0a0b10 60%), #0a0b10',
+        fontFamily: L.font, color: L.text,
+        overflowX: 'hidden',
+      }}>
+        <AutoScrollScreens />
+
+        {/* Compact title */}
+        <div style={{ padding: '28px 20px 20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{
+              width: 36, height: 36, borderRadius: '50%', flexShrink: 0,
+              background: 'conic-gradient(from 0deg, oklch(0.84 0.13 200), oklch(0.72 0.18 340), oklch(0.74 0.16 270), oklch(0.84 0.13 200))',
+              boxShadow: '0 0 20px oklch(0.74 0.16 270 / 0.5)', position: 'relative',
+            }}>
+              <div style={{ position: 'absolute', inset: 3, borderRadius: '50%', background: '#0a0b10' }}/>
+            </div>
+            <div>
+              <div style={{ fontSize: 9, color: L.textDim, fontFamily: L.mono, letterSpacing: 2, textTransform: 'uppercase' }}>
+                Concept · 2026
+              </div>
+              <div style={{ fontSize: 20, fontWeight: 500, marginTop: 2, lineHeight: 1.2 }}>
+                Lumen{' '}
+                <span style={{ fontFamily: L.serif, fontStyle: 'italic', color: L.textDim, fontWeight: 400 }}>
+                  — AI-native finance OS
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Horizontal snap scroll track */}
+        <div ref={trackRef} style={{
+          display: 'flex',
+          overflowX: 'scroll',
+          scrollSnapType: 'x mandatory',
+          scrollbarWidth: 'none',
+          WebkitOverflowScrolling: 'touch',
+          paddingBottom: 8,
+        }}>
+          {visibleScreens.map((s, i) => (
+            <div key={s.id} style={{
+              flexShrink: 0,
+              width: '100vw',
+              scrollSnapAlign: 'center',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              padding: '0 0 8px',
+            }}>
+              <div style={{
+                fontSize: 10, fontFamily: L.mono, letterSpacing: 2,
+                textTransform: 'uppercase', color: L.textDim, marginBottom: 14,
+              }}>{s.label}</div>
+              <Phone screenLabel={s.label} width={phoneW} height={phoneH}>
+                {s.comp}
+              </Phone>
+            </div>
+          ))}
+        </div>
+
+        {/* Navigation dots */}
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 6, padding: '16px 0 24px' }}>
+          {visibleScreens.map((s, i) => (
+            <div key={s.id} onClick={() => {
+              const track = trackRef.current;
+              if (track) track.scrollTo({ left: i * track.clientWidth, behavior: 'smooth' });
+            }} style={{
+              width: i === activeIndex ? 18 : 6,
+              height: 6,
+              borderRadius: 3,
+              background: i === activeIndex ? 'oklch(0.84 0.13 200)' : 'rgba(255,255,255,0.2)',
+              cursor: 'pointer',
+              transition: 'width 0.25s ease, background 0.25s ease',
+            }} />
+          ))}
+        </div>
+
+        <div style={{ textAlign: 'center', paddingBottom: 32, fontSize: 10, fontFamily: L.mono, color: L.textMute, letterSpacing: 2 }}>
+          LUMEN · END OF FLOW
+        </div>
+      </div>
+    );
+  }
+
+  // ── Desktop layout ──────────────────────────────────────────
   return (
     <div style={{
       minHeight: '100vh',
