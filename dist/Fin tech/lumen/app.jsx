@@ -63,6 +63,20 @@ function App() {
   }, []);
 
   React.useEffect(() => {
+    const id = 'lumen-no-anim';
+    if (isMobile) {
+      if (!document.getElementById(id)) {
+        const s = document.createElement('style');
+        s.id = id;
+        s.textContent = '*, *::before, *::after { animation: none !important; transition: none !important; }';
+        document.head.appendChild(s);
+      }
+    } else {
+      document.getElementById(id)?.remove();
+    }
+  }, [isMobile]);
+
+  React.useEffect(() => {
     const track = trackRef.current;
     if (!track) return;
     const onScroll = () => {

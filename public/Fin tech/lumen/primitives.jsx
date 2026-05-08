@@ -235,12 +235,6 @@ if (typeof document !== 'undefined' && !document.getElementById('lumen-anim')) {
     @keyframes lumenShimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
     .lumen-shimmer { background-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent); background-size: 200% 100%; animation: lumenShimmer 3s linear infinite; }
     .lumen-pulse { animation: lumenPulse 3s ease-in-out infinite; }
-    @media (max-width: 639px) {
-      *, *::before, *::after {
-        animation: none !important;
-        transition: none !important;
-      }
-    }
   `;
   document.head.appendChild(s);
 }
