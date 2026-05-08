@@ -2,6 +2,7 @@
 function AutoScrollScreens() {
   React.useEffect(() => {
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return undefined;
+    if (window.innerWidth < 640) return undefined;
 
     let frame = 0;
     const scrollers = Array.from(document.querySelectorAll('[data-screen-label]'))
